@@ -1,0 +1,6 @@
+Django
+django-crispy-forms
+django_import_export
+django-waitress
+PyMySQL
+waitress
