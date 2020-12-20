@@ -15,7 +15,30 @@
       </div>
     </div>
 
-hola mundo
+    <div class="table-responsive">
+      <table class="table table-striped table-sm">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>RFC</th>
+            <th>Nombre</th>
+            <th>Moneda</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for dt in qry %}
+          <tr>
+            <td>{{ dt.id }}</td>
+            <td>{{ dt.RFC_Receptor }}</td>
+            <td>{{ dt.Nombre_Receptor }}</td>
+            <td>{{ dt.Moneda }}</td>
+            <td>{{ dt.Total }}</td>
+          </tr>          
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
 </main>
         

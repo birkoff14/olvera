@@ -7,6 +7,9 @@ from django.contrib.auth import logout as do_logout
 
 from tablib import Dataset
 
+from .resources import InvoiceResource
+from .models import Invoice
+
 # Create your views here.
 
 def login(request):
@@ -41,17 +44,17 @@ def invoice(request):
     }
 
     if request.method == 'POST':
-        invoice_resource = InvoiceResource()
-        databook = Databook()
+        invoice_resource = InvoiceResource()        
         ds = Dataset()
-        new_invoice = request.FILES('xlsfile')
+        new_invoice = request.FILES['xlsfile']
+        #print(new_invoice)
         imported_data = ds.load(new_invoice.read())
-        #result = invoice_resource.imported_data(ds, dry_run=False)
+        print(imported_data)
+        result = invoice_resource.import_data(ds, dry_run=True)
 
-        for dataset in imported_data.sheets():
-            print(dataset.title)  # returns the names of the sheets
-            print(dataset)  # returns the data in each sheet
-
+        if not result.has_errors():
+            # Import now
+            invoice_resource.import_data(ds, dry_run=False)
 
     return render(request, 'importar.html', context)
 
@@ -59,9 +62,39 @@ def customers(request):
     titulo = "Clientes"
     user = request.user
 
+    queryset = Invoice.objects.all()
+
+    print(queryset.query)
+
+
     context = {
         "titulo" : titulo,
-        "usr"    : user
+        "usr"    : user,
+        "qry"    : queryset,
     }
 
     return render(request, 'clientes.html', context)
+
+
+
+
+def import_data(request):
+    if request.method == 'POST':
+        file_format = request.POST['file-format']
+        employee_resource = EmployeeResource()
+        dataset = Dataset()
+        new_employees = request.FILES['importData']
+
+        if file_format == 'CSV':
+            imported_data = dataset.load(new_employees.read().decode('utf-8'),format='csv')
+            result = employee_resource.import_data(dataset, dry_run=True)                                                                 
+        elif file_format == 'JSON':
+            imported_data = dataset.load(new_employees.read().decode('utf-8'),format='json')
+            # Testing data import
+            result = employee_resource.import_data(dataset, dry_run=True) 
+
+        if not result.has_errors():
+            # Import now
+            employee_resource.import_data(dataset, dry_run=False)
+
+    return render(request, 'import.html')

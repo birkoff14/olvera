@@ -4,6 +4,12 @@ from .models import Invoice
 
 # Register your models here.
 
+#admin.site.register(Invoice)
+
 @admin.register(Invoice)
-class InvoiceAdmin(ImportExportModelAdmin):
-    fields = ('Estado_SAT', 'Version', 'Tipo', 'Fecha_Emision', 'Fecha_Timbrado', 'Serie', 'Folio', 'UUID', 'RFC_Receptor', 'Nombre_Receptor', 'UsoCFDI', 'SubTotal', 'IVA_16', 'Total', 'Total_Trasladados', 'Moneda', 'Forma_De_Pago', 'Metodo_de_Pago', )
+#class InvoiceAdmin(ImportExportModelAdmin):
+class InvoiceAdmin(admin.ModelAdmin):
+    list_display = ('Estado_SAT', 'Fecha_Emision', 'Fecha_Timbrado', 'UUID', 'RFC_Receptor', 'Nombre_Receptor', 'UsoCFDI', 'SubTotal', 'Total', 'Moneda', 'Forma_De_Pago', 'Metodo_de_Pago', 'timestamp')
+
+class ExportInvoiceAdmin(ImportExportModelAdmin):
+    pass

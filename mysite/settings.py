@@ -28,8 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1','localhost', '10.87.35.3']
 
-IMPORT_EXPORT_USE_TRANSACTIONS = True 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -57,6 +55,8 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'mysite.urls'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+IMPORT_EXPORT_USE_TRANSACTIONS = True 
 
 TEMPLATES = [
     {
