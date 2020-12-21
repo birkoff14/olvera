@@ -9,6 +9,7 @@ from tablib import Dataset
 
 from .resources import InvoiceResource
 from .models import Invoice
+from django.db.models import Sum
 
 # Create your views here.
 
@@ -62,9 +63,14 @@ def customers(request):
     titulo = "Clientes"
     user = request.user
 
-    queryset = Invoice.objects.all()
+    #queryset = Invoice.objects.all().order_by('Nombre_Receptor').filter(Nombre_Receptor='Carlos Enrique Ortega Mora')
 
-    print(queryset.query)
+    queryset = Invoice.objects.values('RFC_Receptor', 'Nombre_Receptor', 'Moneda'
+            ).order_by('Nombre_Receptor'
+                       ).annotate(total_price=Sum('Total')
+                                 )#.filter(Nombre_Receptor='Carlos Enrique Ortega Mora')
+
+    #print(queryset.query)
 
 
     context = {
