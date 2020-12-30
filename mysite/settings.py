@@ -26,7 +26,7 @@ SECRET_KEY = 'eypsn=6ij-3ef$y0n84d5%tpw-v1g3wvu47amnb8#-=(ua#hf8'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','localhost', '10.87.35.3']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.87.35.3']
 
 # Application definition
 
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'crispy_forms',
     'import_export',
+    'pandas',
     'conciliacion',
 ]
 

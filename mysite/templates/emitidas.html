@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block content %}
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">{{ titulo }} </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+      <div class="btn-group me-2">
+        <button type="button" class="btn btn-sm btn-outline-secondary">Exportar</button>
+      </div>      
+    </div>
+  </div>
+  <table class="table caption-top">
+    <!-- <caption>List of users</caption> -->
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Año</th>
+        <th scope="col">Mes</th>
+        <th scope="col">Subtotal</th>
+        <th scope="col">IVA 16%</th>
+        <th scope="col">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for dt in qry %}    
+      <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <td>{{ dt.Año }}</td>
+        <td>{{ dt.Mes }}</td>
+        <td>$ {{ dt.SubTotal|floatformat:"2"|intcomma }}</td>
+        <td>$ {{ dt.IVA_16|floatformat:"2"|intcomma }}</td>
+        <td>$ {{ dt.Total|floatformat:"2"|intcomma }}</td>
+      </tr>
+    {% endfor %}  
+    </tbody>
+  </table>
+</main>
+
+{% endblock %}
