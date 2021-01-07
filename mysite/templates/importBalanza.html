@@ -6,17 +6,42 @@
       <h1 class="h2">{{ titulo }} </h1>      
     </div>    
 
+    <div class="text-center text-success align-middle">
+        <h2>{{ file }}</h2>
+    </div>
+
+    {% if not hideForm == 1 %}
+
     <div class="bg-light p-5 rounded">        
         <p class="lead">Seleciona el archivo que deseas subir</p>
         
         <form class="form-inline mt-2 mt-md-0" method="POST" enctype="multipart/form-data">  
             {% csrf_token %}  
             <div class="form-group">
-                <input type="file" class="form-control-file" name="xlsfile">  <br /><br />                  
+                <input type="file" class="form-control-file" name="xlsfile">
+                <br /><br />
+                Selecciona mes a importar
+                <select name="mes" class="form-select" aria-label="Default select example">
+                    <option value="1">Mes 01</option>
+                    <option value="2">Mes 02</option>
+                    <option value="3">Mes 03</option>
+                    <option value="4">Mes 04</option>
+                    <option value="5">Mes 05</option>
+                    <option value="6">Mes 06</option>
+                    <option value="7">Mes 07</option>
+                    <option value="8">Mes 08</option>
+                    <option value="9">Mes 09</option>
+                    <option value="10">Mes 10</option>
+                    <option value="11">Mes 11</option>
+                    <option value="12">Mes 12</option>
+                </select>
             </div>
+            <br /><br />
             <button type="submit" class="btn btn-secondary btn-lg btn-block">Subir</button>
         </form>  
     </div>
+
+    {% endif %}
 
     </main>
 

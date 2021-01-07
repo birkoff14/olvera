@@ -1,12 +1,16 @@
 {% extends "base.html" %}
-{% load humanize %}
-
 
 {% block content %}
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
       <h1 class="h2">{{ titulo }} </h1>      
     </div>    
+
+    <div class="text-center text-success align-middle">
+        <h2>{{ file }}</h2>
+    </div>
+
+    {% if not hideForm == 1 %}
 
     <div class="bg-light p-5 rounded">        
         <p class="lead">Seleciona el archivo que deseas subir</p>
@@ -20,5 +24,8 @@
         </form>  
     </div>
 
+    {% endif %}
+
     </main>
+    
 {% endblock %}

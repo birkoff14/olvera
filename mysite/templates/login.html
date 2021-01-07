@@ -68,8 +68,17 @@
     <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
   </form>
   {% else %}
-  ya estás logueado
+  <div>
+    Ya estás logueado
+    <script>
+      window.onload = function() {
+        // similar behavior as clicking on a link
+        window.location.href = "/menu";
+      }
+      </script>
+  </div>
   {% endif %}
 </body>
 
 </html>
+

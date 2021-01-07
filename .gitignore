@@ -5,3 +5,4 @@ nginx_waitress/
 *.xls*
 conciliacion/migrations
 *.sql
+.env

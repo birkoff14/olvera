@@ -6,10 +6,11 @@ from django.contrib.auth import logout as do_logout
 from django.db.models.functions import Substr
 from django.db.models import Sum
 
-from .resources import InvoiceEmitidasResource, InvoiceRecibidasResource, BalanceResource
 from .models import InvoiceEmitidas, InvoiceRecibidas, Balance
 
-from tablib import Dataset
+import pandas as pd
+from sqlalchemy import create_engine
+from sqlalchemy.types import String
 
 # Create your views here.
 
@@ -44,57 +45,63 @@ def menu(request):
 
 def invoice(request):
 
-    titulo = "Importar facturas emitidas"
+    titulo = "Importar facturas emitidas"    
+    file = ""
+    hideForm = 0
 
+    if request.method == 'POST': 
+                
+        new_invoice = request.FILES['xlsfile']
+        
+        try:
+            df = pd.read_excel(new_invoice, sheet_name='Emitidos (2)')
+            print(df)
+            engine = create_engine('mysql://birkoff:awgUGF7812$.@10.87.35.3/olvera')
+            df.to_sql('conciliacion_invoiceemitidas', con=engine, if_exists='append', index=False)
+            
+        except:
+            file = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"
+
+        finally:
+            hideForm = 1   
+            file = "El archivo subió correctamente"
+    
     context = {
         "titulo" : titulo,
-    }
-
-    if request.method == 'POST':        
-
-        invoice_resource = InvoiceEmitidasResource()        
-        ds = Dataset()
-        #db = Databook()
-        new_invoice = request.FILES['xlsfile']
-        #pt = request.FILES['xlsfile'].file.name
-        #print(pt)
-        #databook = tablib.Databook().load('xlsx', open('file.xlsx', 'rb').read())
-        #databook = db.load(new_invoice.read())
-        imported_data = ds.load(new_invoice.read())        
-        print(imported_data)
-        
-        result = invoice_resource.import_data(ds, dry_run=True)
-        
-        if not result.has_errors():
-            # Import now
-            invoice_resource.import_data(ds, dry_run=False)        
+        "file" : file,
+        "hideForm" : hideForm,
+    }           
 
     return render(request, 'importar.html', context)
 
 def receipts(request):
-    titulo = "Importar facturas recibidas"
     
-    context = {
-        "titulo" : titulo
-    }
+    titulo = "Importar facturas recibidas"
+    file = ""
+    hideForm = 0
     
     if request.method == 'POST':
-        receipts_resource = InvoiceRecibidasResource()
-        ds = Dataset()
-        new_receipts = request.FILES['xlsfile']
-        imported_data = ds.load(new_receipts.read())
-        #print(imported_data)
         
-        result = receipts_resource.import_data(ds, dry_run=True)        
-        if not result.has_errors():
-            # Import now
-            receipts_resource.import_data(ds, dry_run=False)
+        new_receipt = request.FILES['xlsfile']
+        
+        try:
+            df = pd.read_excel(new_receipt, sheet_name='Recibidas (2)')
+            print(df)
+            engine = create_engine('mysql://birkoff:awgUGF7812$.@10.87.35.3/olvera')
+            df.to_sql('conciliacion_invoicerecibidas', con=engine, if_exists='append', index=False)
             
-    #if request.method == "POST":
-    #    file = request.FILES['xlsfile']
-    #    print(file)
-    #    wb = load_workbook(filename=file)
-    #    print(wb.sheetnames)
+        except:
+            file = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"
+
+        finally:
+            hideForm = 1   
+            file = "El archivo subió correctamentessss"        
+    
+    context = {
+        "titulo" : titulo,
+        "file" : file,
+        "hideForm" : hideForm,
+    }
         
     return render(request, 'recibidas.html', context)
 
@@ -161,27 +168,48 @@ def repRecibidas(request):
 
 def impConciliacion(request):
 
-    titulo = "Importar balanza de comprobación"
-
-    context = {
-        "titulo" : titulo
-    }
+    titulo = "Importar balanza de comprobación"  
+    file = ""
+    hideForm = 0  
 
     if request.method == 'POST':
-        balance_resource = BalanceResource()
-        ds = Dataset(['11'])
+        ##balance_resource = BalanceResource()
+        ##ds = Dataset()
         new_conciliacion = request.FILES['xlsfile']
-        imported_data = ds.load(new_conciliacion.read())
+        #mes = form.cleaned_data['mes']
+        mes = request.POST.get('mes', '')
         
+        print('Este es el mes que yo quiero importar: ' + mes)
+        #imported_data = ds.load(new_conciliacion.read())
+        try:
+            df = pd.read_excel(new_conciliacion, sheet_name=mes)
+            print(df)        
+           
+            engine = create_engine('mysql://birkoff:awgUGF7812$.@10.87.35.3/olvera')            
+            df.to_sql('conciliacion_balance', con=engine, if_exists='append', index=False)
+            
+        except:
+            file = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"   
         #new_receipts = request.FILES['xlsfile']
         #imported_data = ds.load(new_receipts.read())
         
-        print(ds)
+        
 
-        result = balance_resource.import_data(ds, dry_run=True)        
-        if not result.has_errors():
+        ##result = balance_resource.import_data(ds, dry_run=True)        
+        ##if not result.has_errors():
             # Import now
-            balance_resource.import_data(ds, dry_run=False)
+            ##balance_resource.import_data(ds, dry_run=False)
+            ##hideForm = 1   
+            ##file = "El archivo subió correctamente"
+        finally:            
+            hideForm = 1   
+            file = "El archivo subió correctamente"
+            
+    context = {
+        "titulo" : titulo,
+        "file" : file,
+        "hideForm" : hideForm,
+    }   
 
     return render(request, 'importBalanza.html', context)
 
@@ -195,7 +223,7 @@ def conciliacion(request, cuenta, campo_1, campo_2, tabla, title_1, title_2):
                                     select a.id, Cuenta, SUBSTR(a.Fecha_Emision, 4, 2) Mes, SUBSTR(a.Fecha_Emision, 7, 4) Año, a.""" + campo_1 + """, b.""" + campo_2 + """ 
                                     from """ + tabla + """ a 
                                     inner join conciliacion_balance b
-                                    on SUBSTR(a.Fecha_Emision, 4, 2) = b.Mes
+                                    on SUBSTR(a.Fecha_Emision, 4, 2) = case when LENGTH(b.Mes) = 1 then Concat('0', b.Mes) when LENGTH(b.Mes) = 2 then b.Mes end
                                     and SUBSTR(a.Fecha_Emision, 7, 4) = b.Año
                                     where Cuenta = '""" + cuenta + """'
                                     ) tbl
@@ -203,7 +231,7 @@ def conciliacion(request, cuenta, campo_1, campo_2, tabla, title_1, title_2):
                                     """) 
         
     
-
+    print(r105)
     context = {
         "titulo" : titulo,
         "r105" : r105,

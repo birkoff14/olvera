@@ -15,5 +15,4 @@ urlpatterns = [
     #path('conciliacion', views.conciliacion, name='conciliacion'),
     path('conciliacion/<str:cuenta>/<str:campo_1>/<str:campo_2>/<str:tabla>/<str:title_1>/<str:title_2>', views.conciliacion, name='conciliacion'),
     #path('export/', views.export_data, name='export'),
-
 ]
