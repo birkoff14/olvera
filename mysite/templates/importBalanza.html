@@ -13,28 +13,44 @@
     {% if not hideForm == 1 %}
 
     <div class="bg-light p-5 rounded">        
+        <div class="text-end">
+            <b>Meses cargados</b> <br />
+            {% for dt in queryset %}
+
+                {{ dt.Mes }} - 
+
+            {% endfor %}
+        </div>
+
         <p class="lead">Seleciona el archivo que deseas subir</p>
         
-        <form class="form-inline mt-2 mt-md-0" method="POST" enctype="multipart/form-data">  
+        <form class="form-inline mt-2 mt-md-0 needs-validation" novalidate method="POST" enctype="multipart/form-data">  
             {% csrf_token %}  
             <div class="form-group">
-                <input type="file" class="form-control-file" name="xlsfile">
+                <input type="file" class="form-control-file" name="xlsfile" required>
+                <div class="invalid-feedback">
+                    Selecciona el archivo de Balanza.
+                </div>
                 <br /><br />
                 Selecciona mes a importar
-                <select name="mes" class="form-select" aria-label="Default select example">
-                    <option value="1">Mes 01</option>
-                    <option value="2">Mes 02</option>
-                    <option value="3">Mes 03</option>
-                    <option value="4">Mes 04</option>
-                    <option value="5">Mes 05</option>
-                    <option value="6">Mes 06</option>
-                    <option value="7">Mes 07</option>
-                    <option value="8">Mes 08</option>
-                    <option value="9">Mes 09</option>
-                    <option value="10">Mes 10</option>
-                    <option value="11">Mes 11</option>
-                    <option value="12">Mes 12</option>
+                <select name="mes" class="form-select" aria-label="Default select example" required>
+                    <option value="">Selecciona un mes</option>
+                    <option value="1">01 - Enero</option>
+                    <option value="2">02 - Febrero</option>
+                    <option value="3">03 - Marzo</option>
+                    <option value="4">04 - Abril</option>
+                    <option value="5">05 - Mayo</option>
+                    <option value="6">06 - Junio</option>
+                    <option value="7">07 - Julio</option>
+                    <option value="8">08 - Agosto</option>
+                    <option value="9">09 - Septiembre</option>
+                    <option value="10">10 - Octubre</option>
+                    <option value="11">11 - Noviembre</option>
+                    <option value="12">12 - Diciembre</option>
                 </select>
+                <div class="invalid-feedback">
+                    Selecciona un mes para carga.
+                </div>
             </div>
             <br /><br />
             <button type="submit" class="btn btn-secondary btn-lg btn-block">Subir</button>

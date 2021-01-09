@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <h1 class="h2">{{ titulo }}</h1>
+      <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">            
+          <button type="button" class="btn btn-sm btn-outline-secondary">Exportar</button>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+          <span data-feather="calendar"></span>
+          This week
+        </button>
+      </div>
+    </div>
+
+    <table class="table caption-top">
+        <caption>Balanzas de Comprobación</caption>
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Mes</th>
+            <th scope="col">Año</th>
+            <th scope="col">Fecha de carga</th>
+            <th scope="col">Eliminar</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for dt in balanzas %}
+          <tr>
+            <th scope="row">{{forloop.counter}}</th>
+            <td>{{dt.Mes}}</td>
+            <td>{{dt.Año}}</td>
+            <td>{{dt.timestamp}}</td>
+            <td><a href="delete/{{dt.Mes}}{{dt.Año}}" class="btn btn-danger" id = '{{dt.Mes}}{{dt.Año}}'>Borrar</a></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+
+
+      <table class="table caption-top">
+        <caption>Facturas Emitidas</caption>
+        <thead>
+          <tr>
+            <th scope="col">ID</th>            
+            <th scope="col">Fecha de carga</th>
+            <th scope="col">Eliminar</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for dt in emitidas %}
+          <tr>
+            <th scope="row">{{forloop.counter}}</th>
+            <td>{{dt.timestamp}}</td>            
+            <td><a href="deletefactem/{{dt.fecha}}" class="btn btn-danger" id = '{{dt.fecha}}'>Borrar</a></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+
+      <table class="table caption-top">
+        <caption>Facturas Recibidas</caption>
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Fecha de carga</th>            
+            <th scope="col">Eliminar</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for dt in recibidas %}
+          <tr>
+            <th scope="row">{{forloop.counter}}</th>
+            <td>{{dt.timestamp}}</td>            
+            <td><a href="deletefactrec/{{dt.fecha}}" class="btn btn-danger" id = '{{dt.fecha}}'>Borrar</a></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+</main>
+
+{% endblock %}

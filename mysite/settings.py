@@ -32,7 +32,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.87.35.3']
 
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'import_export',
     'pandas',
+    'django_static_fontawesome',
     'conciliacion',
 ]
 
@@ -103,8 +104,8 @@ DATABASES = {
             'NAME': 'olvera',
             'USER': 'birkoff',
             'PASSWORD': 'awgUGF7812$.',
-            #'HOST': '192.168.0.14',
-            'HOST': env('DB'),
+            'HOST': '192.168.0.14',
+            #'HOST': env('DB'),
             'PORT': '3306',
             'OPTIONS': {
                 'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",

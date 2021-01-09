@@ -4,3 +4,7 @@ django_import_export
 django-waitress
 PyMySQL
 waitress
+pandas
+SQLAlchemy
+django-environ
+django_static_fontawesome

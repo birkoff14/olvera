@@ -21,7 +21,8 @@ class InvoiceEmitidas(models.Model):
     Moneda = models.CharField(max_length=150, blank=True)
     Forma_De_Pago = models.CharField(max_length=150, blank=True)
     Metodo_de_Pago = models.CharField(max_length=150, blank=True)
-    timestamp = models.DateTimeField(auto_now=False, auto_now_add=True, verbose_name="Fecha")
+    timestamp = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False, verbose_name="Fecha")
+    last_modified = models.DateTimeField(auto_now=True, editable=False, null=False, blank=False, verbose_name="Ultima Actualización")
     
     
 class InvoiceRecibidas(models.Model):
@@ -96,7 +97,8 @@ class InvoiceRecibidas(models.Model):
     DIOT_IVA = models.CharField(max_length=150, blank=True)
     DIOT_BASE_16 = models.CharField(max_length=150, blank=True)
     COMPLEMENTO_DE_PAGO = models.CharField(max_length=150, blank=True)
-    timestamp = models.DateTimeField(auto_now=False, auto_now_add=True, verbose_name="Fecha")
+    timestamp = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False, verbose_name="Fecha")
+    last_modified = models.DateTimeField(auto_now=True, editable=False, null=False, blank=False, verbose_name="Ultima Actualización")
     
 class Balance(models.Model):
     Cuenta   = models.CharField(max_length=150, blank=True)
@@ -109,4 +111,5 @@ class Balance(models.Model):
     Acreedor_2 = models.CharField(max_length=150, blank=True)
     Mes = models.CharField(max_length=150, blank=True)
     Año = models.CharField(max_length=150, blank=True)
-    timestamp = models.DateTimeField(auto_now=False, auto_now_add=True, verbose_name="Fecha")
+    timestamp = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False, verbose_name="Fecha")
+    last_modified = models.DateTimeField(auto_now=True, editable=False, null=False, blank=False, verbose_name="Ultima Actualización")

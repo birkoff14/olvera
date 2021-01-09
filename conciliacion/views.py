@@ -5,6 +5,7 @@ from django.contrib.auth import login as do_login
 from django.contrib.auth import logout as do_logout
 from django.db.models.functions import Substr
 from django.db.models import Sum
+from django.db import connection
 
 from .models import InvoiceEmitidas, InvoiceRecibidas, Balance
 
@@ -95,7 +96,7 @@ def receipts(request):
 
         finally:
             hideForm = 1   
-            file = "El archivo subió correctamentessss"        
+            file = "El archivo subió correctamente"        
     
     context = {
         "titulo" : titulo,
@@ -170,7 +171,11 @@ def impConciliacion(request):
 
     titulo = "Importar balanza de comprobación"  
     file = ""
-    hideForm = 0  
+    hideForm = 0
+    
+    queryset = Balance.objects.values('Mes').distinct().order_by('Mes')
+    
+    print(queryset)
 
     if request.method == 'POST':
         ##balance_resource = BalanceResource()
@@ -209,14 +214,14 @@ def impConciliacion(request):
         "titulo" : titulo,
         "file" : file,
         "hideForm" : hideForm,
+        "queryset" : queryset,
     }   
 
     return render(request, 'importBalanza.html', context)
 
 def conciliacion(request, cuenta, campo_1, campo_2, tabla, title_1, title_2):
     titulo = "Conciliación"
-    #title_1 = request.GET['title_1']
-    #title_2 = request.GET['title_2']
+    count = cuenta
     
     if request.method == 'GET':
         r105 = InvoiceEmitidas.objects.raw("""select id, Cuenta, Mes, Año, Sum(""" + campo_1 + """) campo_1, """ + campo_2 + """ campo_2, (Sum(""" + campo_1 + """) - """ + campo_2 + """) Diff from (
@@ -228,20 +233,93 @@ def conciliacion(request, cuenta, campo_1, campo_2, tabla, title_1, title_2):
                                     where Cuenta = '""" + cuenta + """'
                                     ) tbl
                                     group by Mes, Año, """ + campo_2 + """, Cuenta
-                                    """) 
-        
-    
-    print(r105)
+                                    """)
     context = {
         "titulo" : titulo,
         "r105" : r105,
         "title_1" : title_1,
         "title_2" : title_2,
+        "cuenta" : count,
     }
-    
-    #print(r105)
 
     return render(request, 'conciliacion.html', context)
+
+def impbalanza(request):
+    
+    titulo = "Archivos cargados"
+    
+    balanzas = Balance.objects.values('Mes', 'Año', 'timestamp').distinct()
+    emitidas = InvoiceEmitidas.objects.raw("select DISTINCT 1 id, timestamp,  replace(replace(replace(cast(timestamp as char), ' ', ''),'-',''),':', '') fecha from conciliacion_invoiceemitidas")
+    recibidas = InvoiceRecibidas.objects.raw("select DISTINCT 1 id, timestamp, replace(replace(replace(cast(timestamp as char), ' ', ''),'-',''),':', '') fecha from conciliacion_invoicerecibidas")
+    
+    context = {
+        "titulo" : titulo,
+        'balanzas' : balanzas,
+        'emitidas' : emitidas,
+        'recibidas' : recibidas,
+    }    
+    
+    return render(request, 'balanzasCargadas.html', context)
+
+def delete_balanza(request, balanza_id):
+    
+    delete = str(balanza_id)
+            
+    try:
+        #selBalanza = Balance.objects.get(Concat(Mes, Año) = delete)
+        #selBalanza = Balance.objects.raw("delete from conciliacion_balance where CONCAT(Mes, Año) = '" + delete + "'")
+        #print(selBalanza)        
+        
+            with connection.cursor() as cursor:
+                cursor.execute("DELETE FROM conciliacion_balance WHERE CONCAT(Mes, Año) = '" + delete + "'")
+            #"DELETE FROM mydb_mymodel WHERE s_type = '%s' AND barcode = '%s' AND shopcode = '%s' AND date = '%s'" ,
+            #[d.s_type,d.barcode,d.shopcode,d.date]
+        #)            
+    except Balance.DoesNotExist:        
+        #print('No jalo :(')
+        return redirect('menu')
+    
+    #selBalanza.delete()
+    
+    return redirect('impbalanza')
+
+def delete_factemitidas(request, factemitidas_id):
+    
+    factura = str(factemitidas_id)
+    
+    try:
+        with connection.cursor() as cursor:            
+            #cursor = "select DISTINCT timestamp from conciliacion_invoiceemitidas where replace(replace(replace(cast(timestamp as char), ' ', ''),'-',''),':', '') = '" + factura + "'"        
+            cursor.execute("delete from conciliacion_invoiceemitidas where replace(replace(replace(cast(timestamp as char), ' ', ''),'-',''),':', '') = '" + factura + "'")
+            print(cursor)
+        
+    except InvoiceEmitidas.DoesNotExist:        
+        #print('No jalo :(')
+        return redirect('menu')
+    
+    finally:
+        print('Eliminicación de facturas emitidas con fecha: ' + factura)
+    
+    return redirect('impbalanza')
+
+def delete_factrecibidas(request, factrecibidas_id):
+    
+    factura = str(factrecibidas_id)
+    
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("delete from conciliacion_invoicerecibidas where replace(replace(replace(cast(timestamp as char), ' ', ''),'-',''),':', '') = '" + factura + "'")
+            print(cursor)
+            
+    except InvoiceRecibidas.DoesNotExist:        
+        #print('No jalo :(')
+        return redirect('menu')
+    
+    finally:
+        print('Eliminicación de facturas emitidas con fecha: ' + factura)
+        
+    return redirect('impbalanza')
+
 """
 def export_data(request):
     response = HttpResponse(content_type='application/vnd.ms-excel')

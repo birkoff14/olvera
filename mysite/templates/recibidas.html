@@ -15,11 +15,15 @@
     <div class="bg-light p-5 rounded">        
         <p class="lead">Seleciona el archivo que deseas subir</p>
         
-        <form class="form-inline mt-2 mt-md-0" method="POST" enctype="multipart/form-data">  
+        <form class="form-inline mt-2 mt-md-0 needs-validation" novalidate method="POST" enctype="multipart/form-data">  
             {% csrf_token %}  
             <div class="form-group">
-                <input type="file" class="form-control-file" name="xlsfile">  <br /><br />                  
-            </div>
+                <input type="file" class="form-control-file" name="xlsfile" required>                  
+                <div class="invalid-feedback">
+                    Selecciona el archivo de CFDI.
+                </div>
+            </div>            
+            <br /><br />
             <button type="submit" class="btn btn-secondary btn-lg btn-block">Subir</button>
         </form>  
     </div>

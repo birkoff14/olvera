@@ -3,7 +3,7 @@
 {% block content %}
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-      <h1 class="h2">{{ titulo }} </h1>      
+      <h1 class="h2"><span data-feather="file-text"></span> {{ titulo }} </h1>      
     </div>    
               
     <div class="text-center text-success align-middle">
@@ -15,11 +15,15 @@
     <div class="bg-light p-5 rounded">        
         <p class="lead">Seleciona el archivo que deseas subir</p>
         
-        <form class="form-inline mt-2 mt-md-0" method="POST" enctype="multipart/form-data">  
+        <form class="form-inline mt-2 mt-md-0 needs-validation" novalidate method="POST" enctype="multipart/form-data">  
             {% csrf_token %}  
             <div class="form-group">
-                <input type="file" class="form-control-file" name="xlsfile">  <br /><br />                  
-            </div>
+                <input type="file" class="form-control-file" name="xlsfile" required>                    
+                <div class="invalid-feedback">
+                    Selecciona el archivo de CFDI.
+                </div>
+            </div>            
+            <br /><br />
             <button type="submit" class="btn btn-secondary btn-lg btn-block">Subir</button>
         </form>  
     </div>
