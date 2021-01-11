@@ -34,7 +34,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.87.35.3']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.87.35.3','192.168.0.14']
 
 # Application definition
 
@@ -47,9 +47,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'crispy_forms',
-    'import_export',
+    #'import_export',
     'pandas',
-    'django_static_fontawesome',
+    #'django_static_fontawesome',
     'conciliacion',
 ]
 
@@ -101,10 +101,10 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'olvera',
-            'USER': 'birkoff',
-            'PASSWORD': 'awgUGF7812$.',
-            'HOST': '192.168.0.14',
+            'NAME': env('DB'),
+            'USER': env('User'),
+            'PASSWORD': env('Password'),
+            'HOST': env('Server'),
             #'HOST': env('DB'),
             'PORT': '3306',
             'OPTIONS': {

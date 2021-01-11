@@ -12,6 +12,7 @@ from .models import InvoiceEmitidas, InvoiceRecibidas, Balance
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.types import String
+import sys
 
 # Create your views here.
 
@@ -60,8 +61,11 @@ def invoice(request):
             engine = create_engine('mysql://birkoff:awgUGF7812$.@10.87.35.3/olvera')
             df.to_sql('conciliacion_invoiceemitidas', con=engine, if_exists='append', index=False)
             
-        except:
+        except Exception:
             file = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"
+            print(file)
+            e = sys.exc_info()
+            print(e)
 
         finally:
             hideForm = 1   
@@ -91,8 +95,11 @@ def receipts(request):
             engine = create_engine('mysql://birkoff:awgUGF7812$.@10.87.35.3/olvera')
             df.to_sql('conciliacion_invoicerecibidas', con=engine, if_exists='append', index=False)
             
-        except:
+        except Exception:
             file = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"
+            print(file)
+            e = sys.exc_info()
+            print(e)
 
         finally:
             hideForm = 1   
@@ -175,7 +182,7 @@ def impConciliacion(request):
     
     queryset = Balance.objects.values('Mes').distinct().order_by('Mes')
     
-    print(queryset)
+    print(queryset.query)
 
     if request.method == 'POST':
         ##balance_resource = BalanceResource()
@@ -190,11 +197,14 @@ def impConciliacion(request):
             df = pd.read_excel(new_conciliacion, sheet_name=mes)
             print(df)        
            
-            engine = create_engine('mysql://birkoff:awgUGF7812$.@10.87.35.3/olvera')            
+            engine = create_engine('mysql://birkoff:awgUGF7812$.@192.168.0.14/olvera')            
             df.to_sql('conciliacion_balance', con=engine, if_exists='append', index=False)
             
-        except:
-            file = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"   
+        except Exception:
+            file = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"
+            print(file)
+            e = sys.exc_info()
+            print(e)
         #new_receipts = request.FILES['xlsfile']
         #imported_data = ds.load(new_receipts.read())
         
