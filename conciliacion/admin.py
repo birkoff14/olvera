@@ -7,7 +7,7 @@ from .models import InvoiceEmitidas, InvoiceRecibidas, Balance
 #admin.site.register(InvoiceRecibidas)
 @admin.register(InvoiceRecibidas)
 class InvoiceAdmin(admin.ModelAdmin):    
-    list_display = ('Estado_SAT', 'Fecha_Emision', 'Fecha_Timbrado', 'UUID', 'RFC_Receptor', 'Nombre_Receptor', 'UsoCFDI', 'SubTotal', 'Total', 'Moneda', 'Forma_De_Pago', 'Metodo_de_Pago', 'timestamp')
+    list_display = ('Estado_SAT', 'Fecha_Emision', 'Fecha_Timbrado', 'UUID', 'RFC_Receptor', 'Nombre_Receptor', 'UsoCFDI', 'SubTotal', 'Total', 'Moneda', 'FormaDePago', 'Metodo_de_Pago', 'timestamp')
     
 @admin.register(InvoiceEmitidas)
 #class InvoiceAdmin(ImportExportModelAdmin):

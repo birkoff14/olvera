@@ -1,13 +1,17 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">{{ titulo }} </h1>
-
+    <h1 class="h2">{{ titulo }}</h1>
+    <hr />
+    <br />
   </div>
-
+  <div class="text-center">
+    <img src="{% static 'img/logo.png' %}" class="img-fluid" alt="Olvera" width="450" height="400">
+  </div>
 </main>
 
 {% endblock %}

@@ -12,7 +12,7 @@ from .models import InvoiceEmitidas, InvoiceRecibidas, Balance
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.types import String
-import sys
+import sys, os
 
 # Create your views here.
 
@@ -47,18 +47,20 @@ def menu(request):
 
 def invoice(request):
 
-    titulo = "Importar facturas emitidas"    
+    titulo = "Importar reporte de facturas emitidas"    
     file = ""
     hideForm = 0
 
-    if request.method == 'POST': 
-                
+    if request.method == 'POST':
+        
+        p = os.getcwd()
+        print(p)
         new_invoice = request.FILES['xlsfile']
         
         try:
-            df = pd.read_excel(new_invoice, sheet_name='Emitidos (2)')
+            df = pd.read_excel(new_invoice, sheet_name='Emitidos')
             print(df)
-            engine = create_engine('mysql://birkoff:awgUGF7812$.@10.87.35.3/olvera')
+            engine = create_engine('mysql://birkoff:awgUGF7812$.@192.168.0.14/olvera')
             df.to_sql('conciliacion_invoiceemitidas', con=engine, if_exists='append', index=False)
             
         except Exception:
@@ -81,7 +83,7 @@ def invoice(request):
 
 def receipts(request):
     
-    titulo = "Importar facturas recibidas"
+    titulo = "Importar reporte de facturas recibidas"
     file = ""
     hideForm = 0
     
@@ -90,9 +92,9 @@ def receipts(request):
         new_receipt = request.FILES['xlsfile']
         
         try:
-            df = pd.read_excel(new_receipt, sheet_name='Recibidas (2)')
+            df = pd.read_excel(new_receipt, sheet_name='Recibidas')
             print(df)
-            engine = create_engine('mysql://birkoff:awgUGF7812$.@10.87.35.3/olvera')
+            engine = create_engine('mysql://birkoff:awgUGF7812$.@192.168.0.14/olvera')
             df.to_sql('conciliacion_invoicerecibidas', con=engine, if_exists='append', index=False)
             
         except Exception:
