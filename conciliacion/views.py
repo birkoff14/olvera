@@ -6,15 +6,25 @@ from django.contrib.auth import logout as do_logout
 from django.db.models.functions import Substr
 from django.db.models import Sum
 from django.db import connection
+from django.http import HttpResponse
 
 from .models import InvoiceEmitidas, InvoiceRecibidas, Balance
 
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.types import String
-import sys, os
+from openpyxl import Workbook
+
+import environ, sys
 
 # Create your views here.
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+# reading .env file
+environ.Env.read_env()
 
 def login(request):
     form = AuthenticationForm()
@@ -50,33 +60,38 @@ def invoice(request):
     titulo = "Importar reporte de facturas emitidas"    
     file = ""
     hideForm = 0
+    txt = "El archivo subió correctamente"
+    e = ""
 
     if request.method == 'POST':
-        
-        p = os.getcwd()
-        print(p)
+
         new_invoice = request.FILES['xlsfile']
-        
+        #new_invoice = env('CFDI')
+        fname = new_invoice
+        stream = fname.read()
+        #print(stream)        
+
         try:
-            df = pd.read_excel(new_invoice, sheet_name='Emitidos')
+            df = pd.read_excel(stream, sheet_name='Emitidos')
             print(df)
-            engine = create_engine('mysql://birkoff:awgUGF7812$.@192.168.0.14/olvera')
+            engine = create_engine(env('conn'))
             df.to_sql('conciliacion_invoiceemitidas', con=engine, if_exists='append', index=False)
             
-        except Exception:
-            file = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"
-            print(file)
-            e = sys.exc_info()
+        except Exception:            
+            e = sys.exc_info()            
+            txt = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"
+            print(txt)
             print(e)
 
         finally:
             hideForm = 1   
-            file = "El archivo subió correctamente"
+            file = txt
     
     context = {
         "titulo" : titulo,
         "file" : file,
         "hideForm" : hideForm,
+        "error" : e,
     }           
 
     return render(request, 'importar.html', context)
@@ -90,11 +105,15 @@ def receipts(request):
     if request.method == 'POST':
         
         new_receipt = request.FILES['xlsfile']
+        #new_receipt = env('CFDI')
+        fname = new_receipt
+        stream = fname.read()
+        #print(stream)
         
         try:
-            df = pd.read_excel(new_receipt, sheet_name='Recibidas')
+            df = pd.read_excel(stream, sheet_name='Recibidas')
             print(df)
-            engine = create_engine('mysql://birkoff:awgUGF7812$.@192.168.0.14/olvera')
+            engine = create_engine(env('conn'))
             df.to_sql('conciliacion_invoicerecibidas', con=engine, if_exists='append', index=False)
             
         except Exception:
@@ -190,16 +209,20 @@ def impConciliacion(request):
         ##balance_resource = BalanceResource()
         ##ds = Dataset()
         new_conciliacion = request.FILES['xlsfile']
+        #new_conciliacion = env('Balanza')
         #mes = form.cleaned_data['mes']
         mes = request.POST.get('mes', '')
+        fname = new_conciliacion
+        stream = fname.read()
+        #print(stream)
         
         print('Este es el mes que yo quiero importar: ' + mes)
         #imported_data = ds.load(new_conciliacion.read())
         try:
-            df = pd.read_excel(new_conciliacion, sheet_name=mes)
+            df = pd.read_excel(stream, sheet_name=mes)
             print(df)        
            
-            engine = create_engine('mysql://birkoff:awgUGF7812$.@192.168.0.14/olvera')            
+            engine = create_engine(env('conn'))            
             df.to_sql('conciliacion_balance', con=engine, if_exists='append', index=False)
             
         except Exception:
@@ -310,7 +333,7 @@ def delete_factemitidas(request, factemitidas_id):
         return redirect('menu')
     
     finally:
-        print('Eliminicación de facturas emitidas con fecha: ' + factura)
+        print('Eliminación de facturas emitidas con fecha: ' + factura)
     
     return redirect('impbalanza')
 
@@ -328,25 +351,41 @@ def delete_factrecibidas(request, factrecibidas_id):
         return redirect('menu')
     
     finally:
-        print('Eliminicación de facturas emitidas con fecha: ' + factura)
+        print('Eliminación de facturas emitidas con fecha: ' + factura)
         
     return redirect('impbalanza')
 
-"""
-def export_data(request):
+
+def export_data(request, cuenta, campo_1, campo_2, tabla, title_1, title_2):
     response = HttpResponse(content_type='application/vnd.ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="Data.xlsx"'
+    response['Content-Disposition'] = 'attachment; filename="Conciliacion.xlsx"'
     
     # create workbook
     wb = Workbook()
     sheet = wb.active
     
     # export data to Excel
-    rows = models.Data.objects.all().values_list(
+    #rows = .objects.all().values_list('')
+    rows = InvoiceEmitidas.objects.raw("""select id, Cuenta, Mes, Año, Sum(""" + campo_1 + """) campo_1, """ + campo_2 + """ campo_2, (Sum(""" + campo_1 + """) - """ + campo_2 + """) Diff from (
+                                    select a.id, Cuenta, SUBSTR(a.Fecha_Emision, 4, 2) Mes, SUBSTR(a.Fecha_Emision, 7, 4) Año, a.""" + campo_1 + """, b.""" + campo_2 + """ 
+                                    from """ + tabla + """ a 
+                                    inner join conciliacion_balance b
+                                    on SUBSTR(a.Fecha_Emision, 4, 2) = case when LENGTH(b.Mes) = 1 then Concat('0', b.Mes) when LENGTH(b.Mes) = 2 then b.Mes end
+                                    and SUBSTR(a.Fecha_Emision, 7, 4) = b.Año
+                                    where Cuenta = '""" + cuenta + """'
+                                    ) tbl
+                                    group by Mes, Año, """ + campo_2 + """, Cuenta
+                                    """)
     
+    for row_num, row in enumerate(rows, 1):
+    # row is just a tuple
+        for col_num, value in enumerate(row):
+            c5 = sheet.cell(row=row_num+1, column=col_num+1) 
+            c5.value = value
+
     wb.save(response)
 
-    return response"""
+    return response
 
 
 def import_data(request):
