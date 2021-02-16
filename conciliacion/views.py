@@ -47,7 +47,7 @@ def logout(request):
 
 def menu(request):
 
-    titulo = "Olvera Contadores y Asociados"
+    titulo = "Olvera Contadores & Asesores"
 
     context = {
         "titulo" : titulo,
@@ -101,6 +101,8 @@ def receipts(request):
     titulo = "Importar reporte de facturas recibidas"
     file = ""
     hideForm = 0
+    txt = "El archivo subió correctamente"
+    e = ""
     
     if request.method == 'POST':
         
@@ -116,20 +118,21 @@ def receipts(request):
             engine = create_engine(env('conn'))
             df.to_sql('conciliacion_invoicerecibidas', con=engine, if_exists='append', index=False)
             
-        except Exception:
-            file = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"
-            print(file)
-            e = sys.exc_info()
+        except Exception:            
+            e = sys.exc_info()            
+            txt = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"
+            print(txt)
             print(e)
 
         finally:
             hideForm = 1   
-            file = "El archivo subió correctamente"        
+            file = txt
     
     context = {
         "titulo" : titulo,
         "file" : file,
         "hideForm" : hideForm,
+        "error" : e,
     }
         
     return render(request, 'recibidas.html', context)
@@ -185,6 +188,7 @@ def repRecibidas(request):
                                     (select id, Fecha_Emision, SUBSTR(Fecha_Emision, 4,2) Mes, SUBSTR(Fecha_Emision, 7, 4) Año, 
                                     SubTotal, IVA_16, Retenido_IVA, Retenido_ISR, Total from conciliacion_invoicerecibidas
                                     ) tbl
+                                    where Total > 0
                                     group by Mes, Año
                                     Order by 3, 2''')
 
@@ -199,18 +203,17 @@ def impConciliacion(request):
 
     titulo = "Importar balanza de comprobación"  
     file = ""
+    txt = "El archivo subió correctamente"
     hideForm = 0
+    e = ""
     
-    queryset = Balance.objects.values('Mes').distinct().order_by('Mes')
+    queryset = Balance.objects.values('Mes', 'RFC').distinct().order_by('Mes')
     
     print(queryset.query)
 
     if request.method == 'POST':
-        ##balance_resource = BalanceResource()
-        ##ds = Dataset()
+        
         new_conciliacion = request.FILES['xlsfile']
-        #new_conciliacion = env('Balanza')
-        #mes = form.cleaned_data['mes']
         mes = request.POST.get('mes', '')
         fname = new_conciliacion
         stream = fname.read()
@@ -225,30 +228,21 @@ def impConciliacion(request):
             engine = create_engine(env('conn'))            
             df.to_sql('conciliacion_balance', con=engine, if_exists='append', index=False)
             
-        except Exception:
-            file = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"
-            print(file)
-            e = sys.exc_info()
+        except Exception:            
+            e = sys.exc_info()            
+            txt = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"
+            print(txt)
             print(e)
-        #new_receipts = request.FILES['xlsfile']
-        #imported_data = ds.load(new_receipts.read())
-        
-        
 
-        ##result = balance_resource.import_data(ds, dry_run=True)        
-        ##if not result.has_errors():
-            # Import now
-            ##balance_resource.import_data(ds, dry_run=False)
-            ##hideForm = 1   
-            ##file = "El archivo subió correctamente"
-        finally:            
-            hideForm = 1   
-            file = "El archivo subió correctamente"
-            
+        finally:
+            hideForm = 1
+            file = txt
+
     context = {
         "titulo" : titulo,
         "file" : file,
         "hideForm" : hideForm,
+        "error" : e,
         "queryset" : queryset,
     }   
 
@@ -265,6 +259,7 @@ def conciliacion(request, cuenta, campo_1, campo_2, tabla, title_1, title_2):
                                     inner join conciliacion_balance b
                                     on SUBSTR(a.Fecha_Emision, 4, 2) = case when LENGTH(b.Mes) = 1 then Concat('0', b.Mes) when LENGTH(b.Mes) = 2 then b.Mes end
                                     and SUBSTR(a.Fecha_Emision, 7, 4) = b.Año
+                                    and a.RFC_Emisor = b.RFC
                                     where Cuenta = '""" + cuenta + """'
                                     ) tbl
                                     group by Mes, Año, """ + campo_2 + """, Cuenta
@@ -277,15 +272,19 @@ def conciliacion(request, cuenta, campo_1, campo_2, tabla, title_1, title_2):
         "cuenta" : count,
     }
 
+    print(r105)
+
     return render(request, 'conciliacion.html', context)
 
 def impbalanza(request):
     
     titulo = "Archivos cargados"
     
-    balanzas = Balance.objects.values('Mes', 'Año', 'timestamp').distinct()
-    emitidas = InvoiceEmitidas.objects.raw("select DISTINCT 1 id, timestamp,  replace(replace(replace(cast(timestamp as char), ' ', ''),'-',''),':', '') fecha from conciliacion_invoiceemitidas")
-    recibidas = InvoiceRecibidas.objects.raw("select DISTINCT 1 id, timestamp, replace(replace(replace(cast(timestamp as char), ' ', ''),'-',''),':', '') fecha from conciliacion_invoicerecibidas")
+    balanzas = Balance.objects.values('RFC', 'Mes', 'Año', 'timestamp').distinct()
+    emitidas = InvoiceEmitidas.objects.raw("select DISTINCT 1 id, timestamp, RFC_Emisor, replace(replace(replace(cast(timestamp as char), ' ', ''),'-',''),':', '') fecha, count(1) Total from conciliacion_invoiceemitidas group by timestamp, RFC_Emisor")
+    recibidas = InvoiceRecibidas.objects.raw("select DISTINCT 1 id, timestamp, RFC_Receptor, replace(replace(replace(cast(timestamp as char), ' ', ''),'-',''),':', '') fecha, count(1) Total from conciliacion_invoicerecibidas group by timestamp, RFC_Receptor")
+    print(emitidas)
+    print(recibidas)
     
     context = {
         "titulo" : titulo,
@@ -306,7 +305,7 @@ def delete_balanza(request, balanza_id):
         #print(selBalanza)        
         
             with connection.cursor() as cursor:
-                cursor.execute("DELETE FROM conciliacion_balance WHERE CONCAT(Mes, Año) = '" + delete + "'")
+                cursor.execute("DELETE FROM conciliacion_balance WHERE CONCAT(Mes, Año, RFC) = '" + delete + "'")
             #"DELETE FROM mydb_mymodel WHERE s_type = '%s' AND barcode = '%s' AND shopcode = '%s' AND date = '%s'" ,
             #[d.s_type,d.barcode,d.shopcode,d.date]
         #)            

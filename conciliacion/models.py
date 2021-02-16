@@ -167,5 +167,6 @@ class Balance(models.Model):
     Acreedor_2 = models.CharField(max_length=150, blank=True)
     Mes = models.CharField(max_length=150, blank=True)
     Año = models.CharField(max_length=150, blank=True)
+    RFC = models.CharField(max_length=150, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False, verbose_name="Fecha")
     last_modified = models.DateTimeField(auto_now=True, editable=False, null=False, blank=False, verbose_name="Ultima Actualización")

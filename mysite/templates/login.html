@@ -51,20 +51,24 @@
 
 <body class="text-center">
   {% if not request.user.is_authenticated %}
-  <form class="form-signin" method="POST" action="{% url 'login' %}">{% csrf_token %}
+  <form class="form-signin needs-validation" novalidate method="POST" action="{% url 'login' %}">{% csrf_token %}
     <!--<img class="mb-4" src="https://getbootstrap.com/docs/4.5/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72"> -->
     <img class="mb-4" src="{% static 'img/logo.png' %}" class="img-fluid img-thumbnail" alt="" width="250" height="200">
     <!--<h2 class="h3 mb-6 font-weight-normal">Olvera Contadores & Asesores</h2> -->
-    <label for="inputEmail" class="sr-only">Usuario</label>
-    <input type="text" id="idUsuario" class="form-control" name="username" placeholder="Usuario" required autofocus>
-    <label for="inputPassword" class="sr-only">Password</label>
-    <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Contraseña" required>
-    <div class="checkbox mb-3">
-      <label>
-        <input type="checkbox" value="remember-me"> Recordar usuario
-      </label>
+    <div class="form-group">
+      <label for="inputEmail" class="sr-only">Usuario</label>
+      <input type="text" id="idUsuario" class="form-control" name="username" placeholder="Usuario" required autofocus>
+      <div class="invalid-feedback">
+        Se debe escribir el usuario.
+      </div>
+      <label for="inputPassword" class="sr-only">Password</label>
+      <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Contraseña" required>
+          <div class="invalid-feedback">
+        Se requiere una contraseña.
+      </div>
+      <br />
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Ingresar</button>
     </div>
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Ingresar</button>
     <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
   </form>
   {% else %}
@@ -82,3 +86,26 @@
 
 </html>
 
+  <script>
+
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function () {
+      'use strict'
+
+      // Fetch all the forms we want to apply custom Bootstrap validation styles to
+      var forms = document.querySelectorAll('.needs-validation')
+
+      // Loop over them and prevent submission
+      Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+          form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+              event.preventDefault()
+              event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+          }, false)
+        })
+    })()
+  </script>

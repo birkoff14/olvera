@@ -11,6 +11,7 @@
         <thead>
           <tr>
             <th scope="col">ID</th>
+            <th scope="col">RFC</th>
             <th scope="col">Mes</th>
             <th scope="col">Año</th>
             <th scope="col">Fecha de carga</th>
@@ -21,15 +22,15 @@
         {% for dt in balanzas %}
           <tr>
             <th scope="row">{{forloop.counter}}</th>
+            <td>{{ dt.RFC }} </td>
             <td>{{dt.Mes}}</td>
             <td>{{dt.Año}}</td>
             <td>{{dt.timestamp}}</td>
-            <td><a href="delete/{{dt.Mes}}{{dt.Año}}" class="btn btn-danger" id = '{{dt.Mes}}{{dt.Año}}'>Borrar</a></td>
+            <td><a href="delete/{{dt.Mes}}{{dt.Año}}{{dt.RFC}}" class="btn btn-danger" id = '{{dt.Mes}}{{dt.Año}}{{dt.RFC}}'>Borrar</a></td>
           </tr>
         {% endfor %}
         </tbody>
       </table>
-
 
       <table class="table caption-top">
         <caption>Facturas Emitidas</caption>
@@ -37,6 +38,8 @@
           <tr>
             <th scope="col">ID</th>            
             <th scope="col">Fecha de carga</th>
+            <th scope="col">RFC Cliente</th>
+            <th scope="col">Total de registros</th>
             <th scope="col">Eliminar</th>
           </tr>
         </thead>
@@ -45,6 +48,8 @@
           <tr>
             <th scope="row">{{forloop.counter}}</th>
             <td>{{dt.timestamp}}</td>            
+            <td>{{ dt.RFC_Emisor }}</td>
+            <td>{{ dt.Total }}</td>
             <td><a href="deletefactem/{{dt.fecha}}" class="btn btn-danger" id = '{{dt.fecha}}'>Borrar</a></td>
           </tr>
         {% endfor %}
@@ -56,7 +61,9 @@
         <thead>
           <tr>
             <th scope="col">ID</th>
-            <th scope="col">Fecha de carga</th>            
+            <th scope="col">Fecha de carga</th>  
+            <th scope="col">RFC Cliente</th>
+            <th scope="col">Total de registros</th>          
             <th scope="col">Eliminar</th>
           </tr>
         </thead>
@@ -65,6 +72,8 @@
           <tr>
             <th scope="row">{{forloop.counter}}</th>
             <td>{{dt.timestamp}}</td>            
+            <td>{{ dt.RFC_Receptor }}</td>
+            <td>{{ dt.Total }}</td>
             <td><a href="deletefactrec/{{dt.fecha}}" class="btn btn-danger" id = '{{dt.fecha}}'>Borrar</a></td>
           </tr>
         {% endfor %}

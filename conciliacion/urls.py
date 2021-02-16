@@ -16,7 +16,7 @@ urlpatterns = [
     path('conciliacion/<str:cuenta>/<str:campo_1>/<str:campo_2>/<str:tabla>/<str:title_1>/<str:title_2>', views.conciliacion, name='conciliacion'),
     path('export/<str:cuenta>/<str:campo_1>/<str:campo_2>/<str:tabla>/<str:title_1>/<str:title_2>', views.export_data, name='export'),
     path('impbalanza', views.impbalanza, name='impbalanza'),
-    path('delete/<int:balanza_id>', views.delete_balanza),
+    path('delete/<str:balanza_id>', views.delete_balanza),
     path('deletefactem/<int:factemitidas_id>', views.delete_factemitidas),
     path('deletefactrec/<int:factrecibidas_id>', views.delete_factrecibidas),
 ]
