@@ -7,8 +7,10 @@ from django.db.models.functions import Substr
 from django.db.models import Sum
 from django.db import connection
 from django.http import HttpResponse
+from django.views.generic import View
 
 from .models import InvoiceEmitidas, InvoiceRecibidas, Balance
+from .forms import RFC
 
 import pandas as pd
 from sqlalchemy import create_engine
@@ -353,6 +355,92 @@ def delete_factrecibidas(request, factrecibidas_id):
         print('Eliminación de facturas emitidas con fecha: ' + factura)
         
     return redirect('impbalanza')
+
+def pagoprov(request):
+
+    #form = RFC(request.POST or None)
+    
+    RFC = request.POST.get('RFC_Emisor', '')
+    #RFC_comp = "'" + RFC + "'"
+    
+    dsISR_SP = InvoiceEmitidas.objects.raw("""select 1 as id, SUBSTR(Fecha_Emision, 4, 2) Mes, 
+                              RFC_Emisor, round(sum(IVA_16)) IVA_16, round(sum(IVA_16)/0.16) SP_16, round(Sum(Total)) Total
+                              from conciliacion_invoiceemitidas 
+                              where SUBSTR(Fecha_Emision, 7, 4) = 2020                               
+                              and RFC_Emisor =  '""" + RFC + """'
+                              and PROYECTO = 'Supervisión de Proyectos'
+                              and Tipo = 'Factura'                              
+                              group by RFC_Emisor, SUBSTR(Fecha_Emision, 4, 2)
+                              order by RFC_Emisor ASC"""
+                              ) 
+    
+    dsISR_TR = InvoiceEmitidas.objects.raw("""select 1 as id, SUBSTR(Fecha_Emision, 4, 2) Mes, 
+                              RFC_Emisor, round(sum(IVA_16)) IVA_16, round(sum(IVA_16)/0.16) TR_16, round(Sum(Total)) Total
+                              from conciliacion_invoiceemitidas 
+                              where SUBSTR(Fecha_Emision, 7, 4) = 2020                               
+                              and RFC_Emisor =  '""" + RFC + """'
+                              and PROYECTO = 'Transporte'
+                              and Tipo = 'Factura'                              
+                              group by RFC_Emisor, SUBSTR(Fecha_Emision, 4, 2)
+                              order by RFC_Emisor ASC"""
+                              ) 
+    
+    dsISR_IN = InvoiceEmitidas.objects.raw("""select 1 as id, SUBSTR(Fecha_Emision, 4, 2) Mes, 
+                              RFC_Emisor, round(sum(IVA_16)) IVA_16, round(sum(IVA_16)/0.16) SP_16, round(Sum(Total)) Total
+                              from conciliacion_invoiceemitidas 
+                              where SUBSTR(Fecha_Emision, 7, 4) = 2020                               
+                              and RFC_Emisor =  '""" + RFC + """'
+                              and PROYECTO = 'Supervisión de Proyectos'
+                              and Tipo = 'Factura'                              
+                              group by RFC_Emisor, SUBSTR(Fecha_Emision, 4, 2)
+                              order by RFC_Emisor ASC"""
+                              ) 
+    
+    """
+    x = InvoiceEmitidas.objects.values('Fecha_Emision', 'RFC_Emisor'
+                               ).order_by('Fecha_Emision'
+                                          ).annotate(IVA_16=Sum('IVA_16'), SP_16=Sum('IVA_16')/0.16
+                                                     ).filter(RFC_Emisor=RFC_comp)                                  
+   
+    print(x.query)
+    
+    y = x.filter(Proyecto__startswith="Supervi")
+    
+    print(y.query)
+    """
+    
+    context = {
+        "qryISR" : dsISR_SP,
+        "qryISR_TR" : dsISR_TR,
+        "qryISR_IN" : dsISR_IN
+        #"frm" : form
+    }
+    
+    return render(request, 'pagoProv.html', context)
+
+class BasicListView(View):
+    model = None
+
+    def get(self, request, *args, **kwargs):
+        objects = self.model.objects.raw("""select 1 as id, SUBSTR(Fecha_Emision, 4, 2) Mes, RFC_Emisor, round(sum(IVA_16)) IVA_16, round(sum(IVA_16)/0.16) SP_16, round(Sum(Total)) Total
+                              from conciliacion_invoiceemitidas 
+                              where SUBSTR(Fecha_Emision, 7, 4) = 2020                               
+                              and RFC_Emisor = 'SUFF690719CI8' 
+                              and PROYECTO = 'Supervisión de Proyectos'
+                              and Tipo = 'Factura'                              
+                              group by RFC_Emisor, SUBSTR(Fecha_Emision, 4, 2)
+                              order by RFC_Emisor ASC"""
+                              )
+        context = {"qry" : objects,}
+        
+        print(objects.query)
+        
+        return render(request, "pagoProv.html", context)
+    
+# View to display a list of countries
+class ISR_Em(BasicListView):
+    model = Balance
+    
 
 
 def export_data(request, cuenta, campo_1, campo_2, tabla, title_1, title_2):

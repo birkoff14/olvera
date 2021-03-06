@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<style>
+    div.dataTables_wrapper {
+        width: 100%;
+        margin: 0 auto;
+    }
+</style>
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"></div>
+
+    <div class="row">
+      <form method="POST" action="">{% csrf_token %}
+        <select name="RFC_Emisor" class="select form-control" required id="id_RFC_Emisor"> 
+          <option value="" selected>---------</option> 
+          <option value="AMI830615IA0">AMI830615IA0</option> 
+          <option value="SUFF690719CI8">SUFF690719CI8</option> 
+        </select>
+        <input type ='submit' value='Registrame'>
+    </form>
+    </div>
+
+    <div class="table-responsive">
+        <table class="display nowrap" style="width:100%" id="ISR">
+          <thead>            
+            <tr>
+              <th>INGRESOS</th>
+              <th>Enero</th>
+              <th>Febrero</th>          
+              <th>Marzo</th>
+              <th>Abril</th>
+              <th>Mayo</th>
+              <th>Junio</th>
+              <th>Julio</th>
+              <th>Agosto</th>
+              <th>Septiembre</th>
+              <th>Octubre</th>
+              <th>Noviembre</th>
+              <th>Diciembre</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>            
+            <tr>
+              <td>SERVICIOS PROFESIONALES16% IVA</td>
+              {% for dt in qryISR %}
+              <td>{{ dt.SP_16 }}</td>
+              {% endfor %}
+              <td>aqui total</td>
+            </tr>            
+            <tr>
+              <td>TRANSPORTE 16%</td>
+              {% for dt in qryISR_TR %}
+              <td>{{ dt.TR_16 }}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <td>Ingresos Exentos IVA</td>
+              {% for dt in qryISR_IN %}
+              <td>{{ dt.SP_16 }}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <td>Ingresos obtenidos del mes</td>
+            </tr>
+            <tr>
+              <td>Ingresos obtenidos acumulados</td>
+            </tr>
+            <tr>
+              sasa
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+
+
+</main>
+
+<script>
+    $(document).ready(function() {
+    $('#ISR').DataTable( {
+        "scrollX": true
+    } );
+} );
+</script>
+
+{% endblock %}

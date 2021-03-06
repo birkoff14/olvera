@@ -1,6 +1,8 @@
 from django.urls import path
 
 from conciliacion import views
+from .views import BasicListView
+from .models import Balance
 
 urlpatterns = [
     path('', views.login, name='login'),
@@ -19,4 +21,6 @@ urlpatterns = [
     path('delete/<str:balanza_id>', views.delete_balanza),
     path('deletefactem/<int:factemitidas_id>', views.delete_factemitidas),
     path('deletefactrec/<int:factrecibidas_id>', views.delete_factrecibidas),
+    path('pagoprov', views.pagoprov, name='pagoprov'),
+    path("country-list/", BasicListView.as_view(model=Balance), name="country_list"),
 ]

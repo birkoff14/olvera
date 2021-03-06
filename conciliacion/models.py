@@ -170,3 +170,18 @@ class Balance(models.Model):
     RFC = models.CharField(max_length=150, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False, verbose_name="Fecha")
     last_modified = models.DateTimeField(auto_now=True, editable=False, null=False, blank=False, verbose_name="Ultima Actualización")
+    
+    
+class CFDI_Emitidas(models.Model):
+    Mes = models.CharField(max_length=150, blank=True)
+    Anio = models.CharField(max_length=150, blank=True)
+    RFC = models.CharField(max_length=150, blank=True)
+    Base_0 = models.CharField(max_length=150, blank=True)
+    Base_Exenta = models.CharField(max_length=150, blank=True)
+    
+class Notas_Emitidas(models.Model):
+    Mes = models.CharField(max_length=150, blank=True)
+    Anio = models.CharField(max_length=150, blank=True)
+    RFC = models.CharField(max_length=150, blank=True)
+    Base_0 = models.CharField(max_length=150, blank=True)
+    Base_Exenta = models.CharField(max_length=150, blank=True)

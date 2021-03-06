@@ -1,0 +1,63 @@
+select DISTINCT 1 id, timestamp, RFC_Emisor, replace(replace(replace(cast(timestamp as char), ' ', ''),'-',''),':', '') fecha, count(1) Total 
+from conciliacion_invoiceemitidas group by timestamp, RFC_Emisor
+
+SELECT DISTINCT `conciliacion_balance`.`Mes`, `conciliacion_balance`.`RFC` FROM `conciliacion_balance` ORDER BY `conciliacion_balance`.`Mes` ASC
+
+
+select * from conciliacion_invoiceemitidas where RFC_Emisor = 'SUFF690719CI8' 
+
+
+select id, Cuenta, Mes, Año, Sum(Total) campo_1, Cargos campo_2, (Sum(Total) - Cargos) Diff from (
+                                    select a.id, Cuenta, SUBSTR(a.Fecha_Emision, 4, 2) Mes, SUBSTR(a.Fecha_Emision, 7, 4) Año, a.Total, b.Cargos 
+                                    from conciliacion_invoiceemitidas a 
+                                    inner join conciliacion_balance b
+                                    on SUBSTR(a.Fecha_Emision, 4, 2) = case when LENGTH(b.Mes) = 1 then Concat('0', b.Mes) when LENGTH(b.Mes) = 2 then b.Mes end
+                                    and SUBSTR(a.Fecha_Emision, 7, 4) = b.Año
+                                    and a.RFC_Emisor = b.RFC 
+                                    where Cuenta = '105-00-000-000-000-000-000'
+                                    ) tbl
+                                    group by Mes, Año, Cargos, Cuenta
+                                    
+                                    
+select distinct Proyecto from conciliacion_invoiceemitidas where RFC_Emisor = 'SUFF690719CI8' 
+
+select DISTINCT Nombre_Emisor, RFC_Emisor from conciliacion_invoiceemitidas
+
+
+select 1 as id, SUBSTR(Fecha_Emision, 4, 2) Mes, RFC_Emisor, round(sum(IVA_16)) IVA_16, round(sum(IVA_16)/0.16) SP_16, round(Sum(Total)) Total
+                              from conciliacion_invoiceemitidas 
+                              where SUBSTR(Fecha_Emision, 7, 4) = 2020                               
+                              and RFC_Emisor = 'SUFF690719CI8' 
+                              and Proyecto = 'Supervisión de Proyectos'
+                              and Tipo = 'Factura'                              
+                              group by RFC_Emisor, SUBSTR(Fecha_Emision, 4, 2)
+                              order by RFC_Emisor ASC;
+                             
+                             
+
+                             
+                              
+                              
+select distinct PROYECTO from conciliacion_invoicerecibidas where SUBSTR(Fecha_Emision, 7, 4) = 2020 and RFC_Receptor = 'SUFF690719CI8' 
+
+select 1 as id, SUBSTR(Fecha_Emision, 4, 2) Mes, RFC_Receptor, sum(IVA_16) IVA_16, round(sum(IVA_16)/0.16) SUP_16, round(sum(Total)) Total 
+from conciliacion_invoicerecibidas 
+where RFC_Receptor = 'SUFF690719CI8'
+and SUBSTR(Fecha_Emision, 7, 4) = 2020
+and PROYECTO = 'Gastos de oficina'
+#and Tipo = 'Factura'
+group by Mes
+
+
+
+select 1 as id, SUBSTR(Fecha_Emision, 4, 2) Mes, RFC_Emisor, round(sum(IVA_16)) IVA_16, round(sum(IVA_16)/0.16) SP_16, round(Sum(Total)) Total
+                              from conciliacion_invoiceemitidas 
+                              where SUBSTR(Fecha_Emision, 7, 4) = 2020                               
+                              and RFC_Emisor =  'SUFF690719CI8'
+                              and PROYECTO = 'Supervisión de Proyectos'
+                              and Tipo = 'Factura'                              
+                              group by RFC_Emisor, SUBSTR(Fecha_Emision, 4, 2)
+                              order by RFC_Emisor ASC
+                              
+                              
+
