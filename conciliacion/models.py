@@ -2,6 +2,8 @@ from django.db import models
 
 # Create your models here.
 
+################## Clases anteriores
+
 class InvoiceEmitidas(models.Model):
     Verificado_ó_Asoc = models.CharField(max_length=150, blank=True)
     Estado_SAT = models.CharField(max_length=150, blank=True)
@@ -77,8 +79,7 @@ class InvoiceEmitidas(models.Model):
     COMPLEMENTO_DE_PAGO = models.CharField(max_length=150, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False, verbose_name="Fecha")
     last_modified = models.DateTimeField(auto_now=True, editable=False, null=False, blank=False, verbose_name="Ultima Actualización")
-    
-    
+        
 class InvoiceRecibidas(models.Model):
     Verificado_ó_Asoc = models.CharField(max_length=150, blank=True)
     Estado_SAT = models.CharField(max_length=150, blank=True)
@@ -170,18 +171,145 @@ class Balance(models.Model):
     RFC = models.CharField(max_length=150, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True, editable=False, null=False, blank=False, verbose_name="Fecha")
     last_modified = models.DateTimeField(auto_now=True, editable=False, null=False, blank=False, verbose_name="Ultima Actualización")
+
+
+################## Nuevas clases
+
+class Comprobante(models.Model):
+    Version = models.CharField(max_length=5, blank=True)
+    Serie = models.CharField(max_length=20, blank=True)
+    Folio = models.CharField(max_length=20, blank=True)
+    Fecha = models.CharField(max_length=25, blank=True)
+    FormaPago = models.CharField(max_length=10, blank=True)
+    NoCertificado = models.CharField(max_length=30, blank=True)
+    SubTotal = models.CharField(max_length=15, blank=True)
+    Moneda = models.CharField(max_length=50, blank=True)
+    Total = models.CharField(max_length=15, blank=True)
+    TipoDeComprobante = models.CharField(max_length=10, blank=True)
+    MetodoPago = models.CharField(max_length=10, blank=True)
+    LugarExpedicion = models.CharField(max_length=250, blank=True)
+    UUIDInt = models.CharField(max_length=60, blank=True)
+
+class Emisor(models.Model):
+    Rfc = models.CharField(max_length=15, blank=True)
+    Nombre = models.CharField(max_length=150, blank=True)
+    RegimenFiscal = models.CharField(max_length=5, blank=True)
+    UUIDInt = models.CharField(max_length=60, blank=True)
+
+class Receptor(models.Model):
+    Rfc = models.CharField(max_length=15, blank=True)
+    Nombre = models.CharField(max_length=150, blank=True)
+    UsoCFDI = models.CharField(max_length=5, blank=True)
+    UUIDInt = models.CharField(max_length=60, blank=True)
+
+class Concepto(models.Model):
+    ClaveProdServ = models.CharField(max_length=15, blank=True)
+    NoIdentificacion = models.CharField(max_length=20, blank=True)
+    Cantidad = models.CharField(max_length=20, blank=True)
+    ClaveUnidad = models.CharField(max_length=20, blank=True)
+    Unidad = models.CharField(max_length=20, blank=True)
+    Descripcion = models.CharField(max_length=250, blank=True)
+    ValorUnitario = models.CharField(max_length=20, blank=True)
+    Importe = models.CharField(max_length=20, blank=True)
+    UUIDInt = models.CharField(max_length=60, blank=True)
+
+class Pago(models.Model):
+    FechaPago = models.CharField(max_length=20, blank=True)
+    FormaDePagoP = models.CharField(max_length=20, blank=True)
+    MonedaP = models.CharField(max_length=20, blank=True)
+    Monto = models.CharField(max_length=20, blank=True)
+    NumOperacion = models.CharField(max_length=20, blank=True)
+    UUIDInt = models.CharField(max_length=60, blank=True)
+
+class DoctoRelacionado(models.Model):
+    IdDocumento = models.CharField(max_length=50, blank=True)
+    Folio = models.CharField(max_length=20, blank=True)
+    Serie = models.CharField(max_length=20, blank=True)
+    MonedaDR = models.CharField(max_length=20, blank=True)
+    MetodoDePagoDR = models.CharField(max_length=20, blank=True)
+    NumParcialidad = models.CharField(max_length=20, blank=True)
+    ImpSaldoAnt = models.CharField(max_length=20, blank=True)
+    ImpPagado = models.CharField(max_length=20, blank=True)
+    ImpSaldoInsoluto = models.CharField(max_length=20, blank=True)
+    UUIDInt = models.CharField(max_length=60, blank=True)
+
+class Impuestos(models.Model):
+    TotalImpuestosTrasladados = models.CharField(max_length=20, blank=True)
+    UUIDInt = models.CharField(max_length=60, blank=True)
+
+class Traslado(models.Model):
+    Base = models.CharField(max_length=20, blank=True)
+    Impuesto = models.CharField(max_length=20, blank=True)
+    TipoFactor = models.CharField(max_length=20, blank=True)
+    TasaOCuota = models.CharField(max_length=20, blank=True)
+    Importe = models.CharField(max_length=20, blank=True)
+    UUIDInt = models.CharField(max_length=60, blank=True)
+
+class TimbreFiscalDigital(models.Model):
+    Version = models.CharField(max_length=5, blank=True)
+    UUID = models.CharField(max_length=150, blank=True)
+    FechaTimbrado = models.CharField(max_length=30, blank=True)
+    RfcProvCertif = models.CharField(max_length=20, blank=True)
+    NoCertificadoSAT = models.CharField(max_length=20, blank=True)
+    UUIDInt = models.CharField(max_length=60, blank=True)
     
+#Nomina
     
-class CFDI_Emitidas(models.Model):
-    Mes = models.CharField(max_length=150, blank=True)
-    Anio = models.CharField(max_length=150, blank=True)
-    RFC = models.CharField(max_length=150, blank=True)
-    Base_0 = models.CharField(max_length=150, blank=True)
-    Base_Exenta = models.CharField(max_length=150, blank=True)
+class Nomina(models.Model):
+    FechaFinalPago = models.CharField(max_length=50, blank=True)
+    FechaInicialPago = models.CharField(max_length=50, blank=True)
+    FechaPago = models.CharField(max_length=50, blank=True)
+    NumDiasPagados = models.CharField(max_length=50, blank=True)
+    TipoNomina = models.CharField(max_length=50, blank=True)
+    TotalOtrosPagos = models.CharField(max_length=50, blank=True)
+    TotalPercepciones = models.CharField(max_length=50, blank=True)
+    Version = models.CharField(max_length=50, blank=True)
+    UUIDInt = models.CharField(max_length=60, blank=True)
+
+class NEmisor(models.Model):
+    RegistroPatronal = models.CharField(max_length=50, blank=True)
+    UUIDInt = models.CharField(max_length=60, blank=True)
     
-class Notas_Emitidas(models.Model):
-    Mes = models.CharField(max_length=150, blank=True)
-    Anio = models.CharField(max_length=150, blank=True)
-    RFC = models.CharField(max_length=150, blank=True)
-    Base_0 = models.CharField(max_length=150, blank=True)
-    Base_Exenta = models.CharField(max_length=150, blank=True)
+class NReceptor(models.Model):
+    Antigüedad = models.CharField(max_length=50, blank=True)
+    ClaveEntFed = models.CharField(max_length=50, blank=True)
+    Curp = models.CharField(max_length=50, blank=True)
+    Departamento = models.CharField(max_length=50, blank=True)
+    FechaInicioRelLaboral = models.CharField(max_length=50, blank=True)
+    NumEmpleado = models.CharField(max_length=50, blank=True)
+    NumSeguridadSocial = models.CharField(max_length=50, blank=True)
+    PeriodicidadPago = models.CharField(max_length=50, blank=True)
+    Puesto = models.CharField(max_length=50, blank=True)
+    RiesgoPuesto = models.CharField(max_length=50, blank=True)
+    SalarioBaseCotApor = models.CharField(max_length=50, blank=True)
+    SalarioDiarioIntegrado = models.CharField(max_length=50, blank=True)
+    Sindicalizado = models.CharField(max_length=50, blank=True)
+    TipoContrato = models.CharField(max_length=50, blank=True)
+    TipoJornada = models.CharField(max_length=50, blank=True)
+    TipoRegimen = models.CharField(max_length=50, blank=True)
+    UUIDInt = models.CharField(max_length=60, blank=True)
+    
+class NPercepciones(models.Model):
+    TotalExento = models.CharField(max_length=50, blank=True)
+    TotalGravado = models.CharField(max_length=50, blank=True)
+    TotalSueldos = models.CharField(max_length=50, blank=True)
+    UUIDInt = models.CharField(max_length=60, blank=True)
+    
+class NPercepcion(models.Model):
+    Clave = models.CharField(max_length=50, blank=True)
+    Concepto = models.CharField(max_length=50, blank=True)
+    ImporteExento = models.CharField(max_length=50, blank=True)
+    ImporteGravado = models.CharField(max_length=50, blank=True)
+    TipoPercepcion = models.CharField(max_length=50, blank=True)
+    UUIDInt = models.CharField(max_length=60, blank=True)
+    
+class OtroPago(models.Model):
+    Clave = models.CharField(max_length=50, blank=True)
+    Concepto = models.CharField(max_length=50, blank=True)
+    Importe = models.CharField(max_length=50, blank=True)
+    TipoOtroPago = models.CharField(max_length=50, blank=True)
+    UUIDInt = models.CharField(max_length=60, blank=True)
+    
+class SubsidioAlEmpleo(models.Model):
+    SubsidioCausado = models.CharField(max_length=50, blank=True)
+    UUIDInt = models.CharField(max_length=60, blank=True)
