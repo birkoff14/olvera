@@ -275,6 +275,7 @@ def conciliacion(request, cuenta, campo_1, campo_2, tabla, title_1, title_2):
                                     on SUBSTR(a.Fecha_Emision, 4, 2) = case when LENGTH(b.Mes) = 1 then Concat('0', b.Mes) when LENGTH(b.Mes) = 2 then b.Mes end
                                     and SUBSTR(a.Fecha_Emision, 7, 4) = b.Año
                                     and a.RFC_Emisor = b.RFC
+                                    and b.RFC = 'SUFF690719CI8'
                                     where Cuenta = '""" + cuenta + """'
                                     ) tbl
                                     group by Mes, Año, """ + campo_2 + """, Cuenta
@@ -285,9 +286,11 @@ def conciliacion(request, cuenta, campo_1, campo_2, tabla, title_1, title_2):
         "title_1" : title_1,
         "title_2" : title_2,
         "cuenta" : count,
+        "rfc" : rfc,
     }
 
     print(r105)
+    #print(rfc)
 
     return render(request, 'conciliacion.html', context)
 
