@@ -2,10 +2,11 @@
 
 {% block content %}
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-      <h1 class="h2">{{ titulo }} </h1>   
-      {{ error }}   
-    </div>    
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ titulo }} </h1>
+        {{ error }}
+    </div>
 
     <div class="text-center text-success align-middle">
         <h2>{{ file }}</h2>
@@ -13,19 +14,22 @@
 
     {% if not hideForm == 1 %}
 
-    <div class="bg-light p-5 rounded">        
+    <div class="bg-light p-5 rounded">
         <p class="lead">Seleciona el archivo de balanza que deseas subir</p>
-        
-        <form class="form-inline mt-2 mt-md-0 needs-validation" novalidate method="POST" enctype="multipart/form-data">  
-            {% csrf_token %}  
+
+        <form class="form-inline mt-2 mt-md-0 needs-validation" novalidate method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
             <div class="form-group">
                 <input type="file" class="form-control" id="inputGroupFile02" name="xlsfile" required>
                 <div class="invalid-feedback">
                     Selecciona el archivo de Balanza.
                 </div>
+                <br />
+                ¿Importar todos los meses?
+                <input type="checkbox" name="all" id='chk' onclick="myFunction()" value="1">
                 <br /><br />
                 Selecciona mes a importar
-                <select name="mes" class="form-select" aria-label="Default select example" required>
+                <select name="mes" class="form-select" aria-label="Default select example" id="inp1">
                     <option value="">Selecciona un mes</option>
                     <option value="1">01 - Enero</option>
                     <option value="2">02 - Febrero</option>
@@ -40,17 +44,35 @@
                     <option value="11">11 - Noviembre</option>
                     <option value="12">12 - Diciembre</option>
                 </select>
-                <div class="invalid-feedback">
+                <div id="myDIV" class="invalid-feedback">
                     Selecciona un mes para carga.
                 </div>
             </div>
             <br /><br />
             <button type="submit" class="btn btn-secondary btn-lg btn-block">Subir</button>
-        </form>  
+        </form>
     </div>
 
     {% endif %}
 
-    </main>
+</main>
+
+
+<script>
+    $(document).ready(function () {
+        $('#chk').click(function () {
+            $('#inp1').prop('disabled', function (i, v) { return !v; });
+        });
+    });
+
+    function myFunction() {
+        var x = document.getElementById("myDIV");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+</script>
 
 {% endblock %}

@@ -1,3 +1,6 @@
+{% load humanize %}
+{{ floatvalue|floatformat:2|intcomma }}
+
 {% load static %}
 <!doctype html>
 <html lang="en">
@@ -11,7 +14,7 @@
   <title>Dashboard Olvera</title>
 
   <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/dashboard/">
-  <link rel="stylesheet" type="text/css" href="{% static 'fontawesome/css/all.min.css' %}" />
+  <!--<link rel="stylesheet" type="text/css" href="{% static 'fontawesome/css/all.min.css' %}" /> -->
 
   <!-- Bootstrap core CSS 
 <link href="{% static 'css/bootstrap.min.css' %}" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" rel="stylesheet" crossorigin="anonymous">
@@ -87,13 +90,13 @@
             <li class="nav-item">
               <a class="nav-link" href="{% url 'invoice' %}">
                 <span data-feather="file-text"></span>
-                Importar facturas emitidas
+                Ver facturas emitidas
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{% url 'receipts' %}">
                 <span data-feather="file-text"></span>
-                Importar facturas recibidas
+                Ver facturas recibidas
               </a>
             </li>
             <li class="nav-item">

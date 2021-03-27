@@ -178,10 +178,10 @@ class Balance(models.Model):
 class Comprobante(models.Model):
     Version = models.CharField(max_length=5, blank=True)
     Serie = models.CharField(max_length=20, blank=True)
-    Folio = models.CharField(max_length=20, blank=True)
+    Folio = models.CharField(max_length=50, blank=True)
     Fecha = models.CharField(max_length=25, blank=True)
-    FormaPago = models.CharField(max_length=10, blank=True)
-    NoCertificado = models.CharField(max_length=30, blank=True)
+    FormaPago = models.CharField(max_length=100, blank=True)
+    NoCertificado = models.CharField(max_length=50, blank=True)
     SubTotal = models.CharField(max_length=15, blank=True)
     Moneda = models.CharField(max_length=50, blank=True)
     Total = models.CharField(max_length=15, blank=True)
@@ -192,23 +192,23 @@ class Comprobante(models.Model):
 
 class Emisor(models.Model):
     Rfc = models.CharField(max_length=15, blank=True)
-    Nombre = models.CharField(max_length=150, blank=True)
+    Nombre = models.CharField(max_length=250, blank=True)
     RegimenFiscal = models.CharField(max_length=5, blank=True)
     UUIDInt = models.CharField(max_length=60, blank=True)
 
 class Receptor(models.Model):
     Rfc = models.CharField(max_length=15, blank=True)
-    Nombre = models.CharField(max_length=150, blank=True)
+    Nombre = models.CharField(max_length=250, blank=True)
     UsoCFDI = models.CharField(max_length=5, blank=True)
     UUIDInt = models.CharField(max_length=60, blank=True)
 
 class Concepto(models.Model):
     ClaveProdServ = models.CharField(max_length=15, blank=True)
-    NoIdentificacion = models.CharField(max_length=20, blank=True)
+    NoIdentificacion = models.CharField(max_length=50, blank=True)
     Cantidad = models.CharField(max_length=20, blank=True)
     ClaveUnidad = models.CharField(max_length=20, blank=True)
     Unidad = models.CharField(max_length=20, blank=True)
-    Descripcion = models.CharField(max_length=250, blank=True)
+    Descripcion = models.CharField(max_length=2500, blank=True)
     ValorUnitario = models.CharField(max_length=20, blank=True)
     Importe = models.CharField(max_length=20, blank=True)
     UUIDInt = models.CharField(max_length=60, blank=True)
@@ -218,7 +218,7 @@ class Pago(models.Model):
     FormaDePagoP = models.CharField(max_length=20, blank=True)
     MonedaP = models.CharField(max_length=20, blank=True)
     Monto = models.CharField(max_length=20, blank=True)
-    NumOperacion = models.CharField(max_length=20, blank=True)
+    NumOperacion = models.CharField(max_length=150, blank=True)
     UUIDInt = models.CharField(max_length=60, blank=True)
 
 class DoctoRelacionado(models.Model):

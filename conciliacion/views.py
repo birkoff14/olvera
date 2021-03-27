@@ -9,7 +9,7 @@ from django.db import connection
 from django.http import HttpResponse
 from django.views.generic import View
 
-from .models import InvoiceEmitidas, InvoiceRecibidas, Balance
+from .models import *
 from .forms import RFC
 
 import pandas as pd
@@ -59,41 +59,20 @@ def menu(request):
 
 def invoice(request):
 
-    titulo = "Importar reporte de facturas emitidas"    
-    file = ""
-    hideForm = 0
-    txt = "El archivo subió correctamente"
-    e = ""
-
-    if request.method == 'POST':
-
-        new_invoice = request.FILES['xlsfile']
-        #new_invoice = env('CFDI')
-        fname = new_invoice
-        stream = fname.read()
-        #print(stream)        
-
-        try:
-            df = pd.read_excel(stream, sheet_name='Emitidos')
-            print(df)
-            engine = create_engine(env('conn'))
-            df.to_sql('conciliacion_invoiceemitidas', con=engine, if_exists='append', index=False)
-            
-        except Exception:            
-            e = sys.exc_info()            
-            txt = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"
-            print(txt)
-            print(e)
-
-        finally:
-            hideForm = 1   
-            file = txt
+    titulo = "Reporte de facturas emitidas"
+    
+    queryset = Comprobante.objects.raw("select 1 as id, Version, YEAR(Fecha) Periodo, Sum(Round(SubTotal, 2)) SubTotal, Sum(ROUND(Total, 2)) Total, Moneda, Rfc, Nombre "
+                                       "from conciliacion_comprobante a inner join conciliacion_emisor b "
+                                       "on a.UUIDInt = b.UUIDInt "
+                                       "where Total != '' "
+                                       "group by Version, YEAR(Fecha), Moneda, Rfc "
+                                       "order by YEAR(Fecha), Nombre ")
+    
+           
     
     context = {
         "titulo" : titulo,
-        "file" : file,
-        "hideForm" : hideForm,
-        "error" : e,
+        "qry" : queryset
     }           
 
     return render(request, 'importar.html', context)
@@ -101,40 +80,17 @@ def invoice(request):
 def receipts(request):
     
     titulo = "Importar reporte de facturas recibidas"
-    file = ""
-    hideForm = 0
-    txt = "El archivo subió correctamente"
-    e = ""
     
-    if request.method == 'POST':
+    queryset = Comprobante.objects.raw("select 1 as id, Version, YEAR(Fecha) Periodo, Sum(Round(SubTotal, 2)) SubTotal, Sum(ROUND(Total, 2)) Total, Moneda, Rfc, Nombre "
+                                       "from conciliacion_comprobante a inner join conciliacion_receptor b "
+                                       "on a.UUIDInt = b.UUIDInt "
+                                       "where Total != '' "
+                                       "group by Version, YEAR(Fecha), Moneda, Rfc "
+                                       "order by YEAR(Fecha), Nombre ")
         
-        new_receipt = request.FILES['xlsfile']
-        #new_receipt = env('CFDI')
-        fname = new_receipt
-        stream = fname.read()
-        #print(stream)
-        
-        try:
-            df = pd.read_excel(stream, sheet_name='Recibidas')
-            print(df)
-            engine = create_engine(env('conn'))
-            df.to_sql('conciliacion_invoicerecibidas', con=engine, if_exists='append', index=False)
-            
-        except Exception:            
-            e = sys.exc_info()            
-            txt = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"
-            print(txt)
-            print(e)
-
-        finally:
-            hideForm = 1   
-            file = txt
-    
     context = {
-        "titulo" : titulo,
-        "file" : file,
-        "hideForm" : hideForm,
-        "error" : e,
+        "titulo" : titulo,    
+        "qry" : queryset
     }
         
     return render(request, 'recibidas.html', context)
@@ -201,6 +157,33 @@ def repRecibidas(request):
 
     return render(request, 'factRecibidas.html', context)
 
+def importBalanza(mes, new_conciliacion, txt):
+    
+    fname = new_conciliacion
+    print("Nombre archivo " + str(fname))
+    stream = fname.read()
+    e= ""
+    
+    try:
+        df = pd.read_excel(stream, sheet_name=mes)
+        print(df)        
+           
+        engine = create_engine(env('conn'))            
+        df.to_sql('conciliacion_balance', con=engine, if_exists='append', index=False)
+            
+    except Exception:            
+        e = sys.exc_info()            
+        txt = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"
+        print(txt)
+        print(e)
+
+    finally:
+        hideForm = 1
+        file = txt
+        
+        return txt, e
+
+
 def impConciliacion(request):
 
     titulo = "Importar balanza de comprobación"  
@@ -208,44 +191,72 @@ def impConciliacion(request):
     txt = "El archivo subió correctamente"
     hideForm = 0
     e = ""
-    
-    queryset = Balance.objects.values('Mes', 'RFC').distinct().order_by('Mes')
-    
-    print(queryset.query)
 
     if request.method == 'POST':
         
         new_conciliacion = request.FILES['xlsfile']
-        mes = request.POST.get('mes', '')
-        fname = new_conciliacion
-        stream = fname.read()
-        #print(stream)
         
-        print('Este es el mes que yo quiero importar: ' + mes)
-        #imported_data = ds.load(new_conciliacion.read())
-        try:
-            df = pd.read_excel(stream, sheet_name=mes)
-            print(df)        
-           
-            engine = create_engine(env('conn'))            
-            df.to_sql('conciliacion_balance', con=engine, if_exists='append', index=False)
+        r = request.POST.get('all', '')
+        print(r) 
+        
+        if request.POST.get('all', '') == '':
             
-        except Exception:            
-            e = sys.exc_info()            
-            txt = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"
-            print(txt)
-            print(e)
+            print("Entro a solo un mes")
+            mes = request.POST.get('mes', '')
+        
+            print('Este es el mes que yo quiero importar: ' + mes)
+            
+            importBalanza(mes, new_conciliacion, txt)
+            
+        else:
+            
+            print('ahora importara los 12 meses')            
+            fname = new_conciliacion
+            print("Nombre archivo " + str(fname))
+            stream = fname.read()
+            
+            #if not os.path.isfile(new_conciliacion):
+            #    print("ya valio")
+            #    return None
+            
+            xls = pd.read_excel(stream, None)            
+            #xls = pd.ExcelFile(stream)
+            t = xls.keys()
+            print(t)
+            #print(xls)
+            #sheets = xls.sheet_names
+            #results = {}
+                     
+            for sheet in t:
+                #results[sheet] = xls.parse(sheet)
+                print("Importando mes: " + sheet)
+                #print(results[sheet])
+                
+                try:                  
+                    #stream = fname.read()  
+                    df = pd.read_excel(stream, sheet_name=sheet)
+                    print(df)
+                    engine = create_engine(env('conn'))            
+                    df.to_sql('conciliacion_balance', con=engine, if_exists='append', index=False)
 
-        finally:
-            hideForm = 1
-            file = txt
+                except Exception:            
+                    e = sys.exc_info()            
+                    txt = "Hubo un error al subir el archivo, favor de comunicarse con el administrador"
+                    print(txt)
+                    print(e)
+
+                finally:
+                    hideForm = 1
+                    file = txt
+            
+        hideForm = 1
+        file = txt
 
     context = {
         "titulo" : titulo,
         "file" : file,
         "hideForm" : hideForm,
         "error" : e,
-        "queryset" : queryset,
     }   
 
     return render(request, 'importBalanza.html', context)
@@ -253,6 +264,8 @@ def impConciliacion(request):
 def conciliacion(request, cuenta, campo_1, campo_2, tabla, title_1, title_2):
     titulo = "Conciliación"
     count = cuenta
+    
+    rfc = Balance.objects.values('RFC').distinct()
     
     if request.method == 'GET':
         r105 = InvoiceEmitidas.objects.raw("""select id, Cuenta, Mes, Año, Sum(""" + campo_1 + """) campo_1, """ + campo_2 + """ campo_2, (Sum(""" + campo_1 + """) - """ + campo_2 + """) Diff from (

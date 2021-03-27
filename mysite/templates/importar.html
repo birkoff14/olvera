@@ -2,37 +2,45 @@
 
 {% block content %}
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-      <h1 class="h2">{{ titulo }} </h1>      
-    </div>    
-              
-    <div class="text-center text-success align-middle">
-        <h2>{{ file }}</h2>
-        {{ error }}
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ titulo }} </h1>
     </div>
-    
-    {% if not hideForm == 1 %}
-
-    <div class="bg-light p-5 rounded">        
-        <p class="lead">Seleciona el archivo Excel CFDI que deseas subir</p>
-        
-        <form class="form-inline mt-2 mt-md-0 needs-validation" novalidate method="POST" enctype="multipart/form-data">  
-            {% csrf_token %}  
-            <div class="form-group">
-                <div class="input-group mb-3">
-                    <input type="file" class="form-control" id="inputGroupFile02" name="xlsfile" required>
-                    <button type="submit" class="input-group-text">Subir</button>
-                    <!-- <label class="input-group-text" for="inputGroupFile02">Upload</label> -->
-                    <div class="invalid-feedback">
-                        Selecciona el archivo de CFDI.
-                    </div>
-                </div>                  
-            </div>
-        </form>  
+    <div class="bg-light p-5 rounded">
+        <p class="lead"> </p>
+        <div class="table-responsive">
+            <table class="table table-striped table-sm" id="example">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>RFC</th>
+                        <th>Periodo</th>
+                        <th>SubTotal</th>
+                        <th>Total</th>
+                        <th>Moneda</th>
+                        <th>Version</th>
+                        <th>Detalle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dt in qry %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ dt.Nombre }}</td>
+                        <td>{{ dt.Rfc }}</td>
+                        <td>{{ dt.Periodo }}</td>                        
+                        <td>{{ dt.SubTotal }}</td>
+                        <td>{{ dt.Total }}</td>
+                        <td>{{ dt.Moneda }}</td>
+                        <td>{{ dt.Version }}</td>
+                        <td></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-
-    {% endif %}
-
-    </main>
+</main>
 
 {% endblock %}
