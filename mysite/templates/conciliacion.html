@@ -8,8 +8,10 @@
     <div class="btn-toolbar mb-2 mb-md-0">
       <form action="">
         <div class="btn-group me-2">
-          <a class="btn btn-sm btn-outline-secondary"
-            href="{% url 'export' '105-00-000-000-000-000-000' 'Total' 'Cargos' 'conciliacion_invoiceemitidas' 'XML Emitidos Total' 'Total de Cargos de Clientes' %}">Exportar</a>
+
+          <!-- <a class="btn btn-sm btn-outline-secondary"
+            href="{#% url 'export' '105-00-000-000-000-000-000' 'Total' 'Cargos' 'conciliacion_invoiceemitidas' 'XML Emitidos Total' 'Total de Cargos de Clientes' %}">Exportar</a> -->
+
         </div>
       </form>
     </div>
@@ -17,96 +19,163 @@
   <div class="table-responsive">
     <!--
     Cuentas: <a
-      href="{% url 'conciliacion' '105-00-000-000-000-000-000' 'Total' 'Cargos' 'conciliacion_invoiceemitidas' 'XML Emitidos Total' 'Total de Cargos de Clientes' %}">105</a>
+      href="{#% url 'conciliacion' '105-00-000-000-000-000-000' 'Total' 'Cargos' 'conciliacion_invoiceemitidas' 'XML Emitidos Total' 'Total de Cargos de Clientes' %}">105</a>
     | <a
-      href="{% url 'conciliacion' '400-00-000-000-000-000-000' 'SubTotal' 'Abonos' 'conciliacion_invoiceemitidas' 'XML Emitidos Subtotal' 'Total Abonos Ingresos' %}">400</a>
+      href="{#% url 'conciliacion' '400-00-000-000-000-000-000' 'SubTotal' 'Abonos' 'conciliacion_invoiceemitidas' 'XML Emitidos Subtotal' 'Total Abonos Ingresos' %}">400</a>
     | <a
-      href="{% url 'conciliacion' '209-00-000-000-000-000-000' 'IVA_16' 'Abonos' 'conciliacion_invoiceemitidas' 'XML Emitidos IVA' 'IVA por Trasladar Abonos Ingresos' %}">209</a>
+      href="{#% url 'conciliacion' '209-00-000-000-000-000-000' 'IVA_16' 'Abonos' 'conciliacion_invoiceemitidas' 'XML Emitidos IVA' 'IVA por Trasladar Abonos Ingresos' %}">209</a>
     | <a
-      href="{% url 'conciliacion' '216-10-000-000-000-000-000' 'Retenido_IVA' 'Abonos' 'conciliacion_invoicerecibidas' 'XML Recibidos IVA Retenido' 'IVA Retenido Abonos' %}">216-10</a>
+      href="{#% url 'conciliacion' '216-10-000-000-000-000-000' 'Retenido_IVA' 'Abonos' 'conciliacion_invoicerecibidas' 'XML Recibidos IVA Retenido' 'IVA Retenido Abonos' %}">216-10</a>
     | <a
-      href="{% url 'conciliacion' '216-04-000-000-000-000-000' 'Retenido_ISR' 'Abonos' 'conciliacion_invoicerecibidas' 'XML Recibidos ISR Retenido' 'ISR Retenido Abonos' %}">216-04</a>
+      href="{#% url 'conciliacion' '216-04-000-000-000-000-000' 'Retenido_ISR' 'Abonos' 'conciliacion_invoicerecibidas' 'XML Recibidos ISR Retenido' 'ISR Retenido Abonos' %}">216-04</a>
     | <a
-      href="{% url 'conciliacion' '119-00-000-000-000-000-000' 'IVA_16' 'Cargos' 'conciliacion_invoicerecibidas' 'XML Recibidos IVA' 'Total Cargos IVA por Acreditar' %}">119</a>
+      href="{#% url 'conciliacion' '119-00-000-000-000-000-000' 'IVA_16' 'Cargos' 'conciliacion_invoicerecibidas' 'XML Recibidos IVA' 'Total Cargos IVA por Acreditar' %}">119</a>
     <hr />
     -->
-    <form action="" name="form1" method="GET">
-      Clientes: <select class="form-control">
-        <option selected>Seleccione el RFC</option>
-        {% for dt in rfc %}
-        <option value="1">{{ dt.RFC }}</option>
+    <form class="form-inline mt-2 mt-md-0 needs-validation" novalidate action="{% url 'conciliacion' %}" name="form1" method="GET">
+      {% csrf_token %}
+      <div class="form-group">
+        Clientes: <select class="form-control" name="RFC" required>
+          <option value="">Seleccione el RFC</option>
+          {% for dt in rfc %}
+          <option value="{{ dt.RFC }}">{{ dt.RFC }}</option>
+          {% endfor %}
+        </select>
+        <div class="invalid-feedback">
+          El RFC es obligatorio.
+        </div>
+        Cuentas:
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="cuenta" id="cuenta105" value="105-00"
+            onclick="myFunction(105)">
+          <label class="form-check-label" for="cuenta105">
+            105
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="cuenta" id="cuenta400" value="400-00"
+            onclick="myFunction(400)">
+          <label class="form-check-label" for="cuenta400">
+            400
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="cuenta" id="cuenta209" value="209-00"
+            onclick="myFunction(209)">
+          <label class="form-check-label" for="cuenta209">
+            209
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="cuenta" id="cuenta21610" value="216-10"
+            onclick="myFunction('216a')">
+          <label class="form-check-label" for="cuenta21610">
+            216-10
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="cuenta" id="cuenta21604" value="216-04"
+            onclick="myFunction('216b')">
+          <label class="form-check-label" for="cuenta21604">
+            216-04
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="cuenta" id="cuenta119" value="119-00"
+            onclick="myFunction(119)">
+          <label class="form-check-label" for="cuenta119">
+            119
+          </label>
+        </div>
+        <input type="hidden" id="campo_1" name="campo_1" value="">
+        <input type="hidden" id="campo_2" name="campo_2" value="">
+        <input type="hidden" id="tabla" name="tabla" value="">
+        <input type="hidden" id="title_1" name="title_1" value="">
+        <input type="hidden" id="title_2" name="title_2" value="">
+        <br /><br />
+        <button type="submit" class="btn btn-secondary btn-lg btn-block">Obtener conciliacion</button>
+      </div>
+    </form>
+    <hr />
+    CUENTA: <b>{{ cuenta }}</b>
+    <hr />
+    <table class="table table-striped table-sm">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Mes</th>
+          <th>Año</th>
+          <th>{{ title_1 }}</th>
+          <th>{{ title_2 }}</th>
+          <th>Diferencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for dt in r105 %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ dt.Mes }}</td>
+          <td>{{ dt.Año }}</td>
+          <td>{{ dt.campo_1|floatformat:"2"|intcomma }}</td>
+          <td>{{ dt.campo_2|floatformat:"2"|intcomma }}</td>
+          <td>{{ dt.Diff|floatformat:"2"|intcomma }}</td>
+        </tr>
         {% endfor %}
-      </select>
-      Cuentas:
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="cuentas" id="cuenta105" value="105">
-        <label class="form-check-label" for="cuenta105">
-          105
-        </label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="cuentas" id="cuenta400" value="400">
-        <label class="form-check-label" for="cuenta400">
-          400
-        </label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="cuentas" id="cuenta209" value="209">
-        <label class="form-check-label" for="cuenta209">
-          209
-        </label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="cuentas" id="cuenta21610" value="216-10">
-        <label class="form-check-label" for="cuenta21610">
-          216-10
-        </label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="cuentas" id="cuenta21604" value="216-04">
-        <label class="form-check-label" for="cuenta21604">
-          216-04
-        </label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="cuentas" id="cuenta119" value="119">
-        <label class="form-check-label" for="cuenta119">
-          119
-        </label>
-  </div>
-  <br /><br />
-  <button type="submit" class="btn btn-secondary btn-lg btn-block">Subir</button>
-</form>
-  <hr />
-  CUENTA: <b>{{ cuenta }}</b>
-  <hr />
-  <table class="table table-striped table-sm">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Mes</th>
-        <th>Año</th>
-        <th>{{ title_1 }}</th>
-        <th>{{ title_2 }}</th>
-        <th>Diferencia</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for dt in r105 %}
-      <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>{{ dt.Mes }}</td>
-        <td>{{ dt.Año }}</td>
-        <td>{{ dt.campo_1|floatformat:"2"|intcomma }}</td>
-        <td>{{ dt.campo_2|floatformat:"2"|intcomma }}</td>
-        <td>{{ dt.Diff|floatformat:"2"|intcomma }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <hr />
+      </tbody>
+    </table>
+    <hr />
   </div>
 
 </main>
+
+<script>
+  function myFunction(cuenta) {
+    //if(cuenta == 105){
+    switch (cuenta) {
+      case 105:
+        document.form1.campo_1.value = 'Total'
+        document.form1.campo_2.value = 'Cargos'
+        document.form1.tabla.value = 'conciliacion_invoiceemitidas'
+        document.form1.title_1.value = 'XML Emitidos Total'
+        document.form1.title_2.value = 'Total de Cargos de Clientes'
+        break;
+      case 400:
+        document.form1.campo_1.value = 'SubTotal'
+        document.form1.campo_2.value = 'Abonos'
+        document.form1.tabla.value = 'conciliacion_invoiceemitidas'
+        document.form1.title_1.value = 'TXML Emitidos Subtotal'
+        document.form1.title_2.value = 'Total Abonos Ingresos'
+        break;
+      case 209:
+        document.form1.campo_1.value = 'IVA_16'
+        document.form1.campo_2.value = 'Abonos'
+        document.form1.tabla.value = 'conciliacion_invoiceemitidas'
+        document.form1.title_1.value = 'XML Emitidos IVA'
+        document.form1.title_2.value = 'IVA por Trasladar Abonos Ingresos'
+        break;
+      case '216a':
+        document.form1.campo_1.value = 'Retenido_IVA'
+        document.form1.campo_2.value = 'Abonos'
+        document.form1.tabla.value = 'conciliacion_invoicerecibidas'
+        document.form1.title_1.value = 'XML Recibidos IVA Retenido'
+        document.form1.title_2.value = 'IVA Retenido Abonos'
+        break;
+      case '216b':
+        document.form1.campo_1.value = 'Retenido_ISR'
+        document.form1.campo_2.value = 'Abonos'
+        document.form1.tabla.value = 'conciliacion_invoicerecibidas'
+        document.form1.title_1.value = 'ML Recibidos ISR Retenido'
+        document.form1.title_2.value = 'ISR Retenido Abonos'
+        break;
+      case 119:
+        document.form1.campo_1.value = 'IVA_16'
+        document.form1.campo_2.value = 'Cargos'
+        document.form1.tabla.value = 'conciliacion_invoicerecibidas'
+        document.form1.title_1.value = 'XML Recibidos IVA'
+        document.form1.title_2.value = 'Total Cargos IVA por Acreditar'
+        break;
+    }
+  }
+</script>
 
 {% endblock %}

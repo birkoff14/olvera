@@ -183,7 +183,6 @@ def importBalanza(mes, new_conciliacion, txt):
         
         return txt, e
 
-
 def impConciliacion(request):
 
     titulo = "Importar balanza de comprobación"  
@@ -261,35 +260,52 @@ def impConciliacion(request):
 
     return render(request, 'importBalanza.html', context)
 
-def conciliacion(request, cuenta, campo_1, campo_2, tabla, title_1, title_2):
-    titulo = "Conciliación"
-    count = cuenta
+def conciliacion(request):
     
+    titulo = "Conciliación"    
+        
     rfc = Balance.objects.values('RFC').distinct()
     
+    cuenta = request.GET.get('cuenta', '')
+    campo_1 = request.GET.get('campo_1', '')
+    campo_2 = request.GET.get('campo_2', '')
+    tabla = request.GET.get('tabla', '')
+    title_1 = request.GET.get('title_1', '')
+    title_2 = request.GET.get('title_2', '')
+    RFC = request.GET.get('RFC', '')
+    
+    print(cuenta)
+    
     if request.method == 'GET':
-        r105 = InvoiceEmitidas.objects.raw("""select id, Cuenta, Mes, Año, Sum(""" + campo_1 + """) campo_1, """ + campo_2 + """ campo_2, (Sum(""" + campo_1 + """) - """ + campo_2 + """) Diff from (
-                                    select a.id, Cuenta, SUBSTR(a.Fecha_Emision, 4, 2) Mes, SUBSTR(a.Fecha_Emision, 7, 4) Año, a.""" + campo_1 + """, b.""" + campo_2 + """ 
-                                    from """ + tabla + """ a 
-                                    inner join conciliacion_balance b
-                                    on SUBSTR(a.Fecha_Emision, 4, 2) = case when LENGTH(b.Mes) = 1 then Concat('0', b.Mes) when LENGTH(b.Mes) = 2 then b.Mes end
-                                    and SUBSTR(a.Fecha_Emision, 7, 4) = b.Año
-                                    and a.RFC_Emisor = b.RFC
-                                    and b.RFC = 'SUFF690719CI8'
-                                    where Cuenta = '""" + cuenta + """'
-                                    ) tbl
-                                    group by Mes, Año, """ + campo_2 + """, Cuenta
-                                    """)
-    context = {
-        "titulo" : titulo,
-        "r105" : r105,
-        "title_1" : title_1,
-        "title_2" : title_2,
-        "cuenta" : count,
-        "rfc" : rfc,
-    }
-
-    print(r105)
+        
+        try:
+                
+            r105 = InvoiceEmitidas.objects.raw("""select id, Cuenta, Mes, Año, Sum(""" + campo_1 + """) campo_1, """ + campo_2 + """ campo_2, (Sum(""" + campo_1 + """) - """ + campo_2 + """) Diff from (
+                                        select a.id, Cuenta, SUBSTR(a.Fecha_Emision, 4, 2) Mes, SUBSTR(a.Fecha_Emision, 7, 4) Año, a.""" + campo_1 + """, b.""" + campo_2 + """ 
+                                        from """ + tabla + """ a 
+                                        inner join conciliacion_balance b
+                                        on SUBSTR(a.Fecha_Emision, 4, 2) = case when LENGTH(b.Mes) = 1 then Concat('0', b.Mes) when LENGTH(b.Mes) = 2 then b.Mes end
+                                        and SUBSTR(a.Fecha_Emision, 7, 4) = b.Año
+                                        and a.RFC_Emisor = b.RFC
+                                        and b.RFC = '""" + RFC + """'                                    
+                                        where Cuenta like CONCAT('""" + cuenta + """', char(37))
+                                        ) tbl
+                                        group by Mes, Año, """ + campo_2 + """, Cuenta
+                                        """)
+            print(r105)
+            
+        except Exception():
+            print(r105)
+    
+        context = {
+            "titulo" : titulo,
+            "r105" : r105,
+            "title_1" : title_1,
+            "title_2" : title_2,
+            "cuenta" : cuenta,
+            "rfc" : rfc,
+        }
+ #print(r105)
     #print(rfc)
 
     return render(request, 'conciliacion.html', context)

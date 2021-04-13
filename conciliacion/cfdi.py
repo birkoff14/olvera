@@ -14,8 +14,8 @@ import re
 config = {
   'user': 'birkoff',
   'password': 'awgUGF7812$.',
-  'host': '192.168.0.21',
-  #'host': '10.87.35.60',
+  #'host': '192.168.0.21',
+  'host': '10.87.35.60',
   'database': 'olvera',
   'raise_on_warnings': True
 }
@@ -37,9 +37,11 @@ def buscaUUID(search):
         #                cursor.execute(add_TimbreFiscalDigital, data_TimbreFiscalDigital)
 
 
-directorio = 'xml'
+directorio = 'xml/test'
 
 def main():
+    idFile = 0
+    
     for root, dirs, files in os.walk(directorio):
         for ark in files:
             if fnmatch.fnmatch(ark,'*.xml'):  
@@ -47,8 +49,7 @@ def main():
                 path = root + "/" + ark    
 
                 cnx = mysql.connector.connect(**config)
-                cursor = cnx.cursor(buffered=True)
-                idFile = 0
+                cursor = cnx.cursor(buffered=True)                
                 doc = parse(path)
 
 
@@ -75,7 +76,6 @@ def main():
 
                         UUID = x
                         print(str(idFile) + ".- Cargando archivo: " + str(UUID))
-
 
                         Comprobante = doc.getElementsByTagName("cfdi:Comprobante")
                         Emisor = doc.getElementsByTagName("cfdi:Emisor")
