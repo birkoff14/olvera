@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ titulo }} </h1>
+    </div>
+    <div class="bg-light p-5 rounded">
+
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col">Numero</th>
+                        <th scope="col">Serie</th>
+                        <th scope="col">Folio</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Subtotal</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Metodo de pago</th>
+                        <th scope="col">Moneda</th>
+                        <th scope="col">UUID</th>
+                        <th scope="col">Datos auxiliares</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dt in query %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ dt.Serie }}</td>
+                        <td>{{ dt.Folio }}</td>
+                        <td>{{ dt.Fecha }}</td>
+                        <td>{{ dt.Subtotal }}</td>
+                        <td>{{ dt.Total }}</td>
+                        <td>{{ dt.MetodoPago }}</td>
+                        <td>{{ dt.Moneda }}</td>
+                        <td>{{ dt.UUIDInt }}</td>
+                        <td>
+                            <a class="btn btn-primary"
+                                onclick="return abrir_modal('{% url 'detailFact'  dt.UUIDInt %}');"
+                                href="#">
+                                <span class="fa fa-plus-circle"></span> Ver
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<div class="modal fade bd-example-modal-lg" id="ventana_modal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+
+</div>
+
+<script>
+    /*
+    $('#myModal').on('shown.bs.modal', function () {
+      $('#myInput').trigger('focus')
+    })
+    */
+
+    function abrir_modal(url) {
+        $('#ventana_modal').load(url, function () {
+            $(this).modal({
+                backdrop: 'static',
+                keyboard: false
+            })
+
+            $(this).modal('show');
+        });
+
+        return false;
+
+    }
+
+    function cerrar_modal() {
+
+        $('#ventana_modal').modal('hide');
+
+        return false;
+    }
+
+</script>
+{% endblock %}

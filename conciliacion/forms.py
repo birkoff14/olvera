@@ -1,5 +1,5 @@
 from django import forms
-from .models import InvoiceEmitidas
+from .models import InvoiceEmitidas, DatosFactura
 
 class RFC(forms.ModelForm):
     class Meta:
@@ -14,3 +14,10 @@ class RFC(forms.ModelForm):
         RFC_Emisor = self.cleaned_data.get("RFC_Emisor")
         RFC_Emisor.replace("'", "")
         return RFC_Emisor
+
+class addDatos(forms.ModelForm):
+    class Meta:
+        model = DatosFactura
+        fields = ["InProyecto", "InContabilidad"]
+        
+    InProyecto = forms.ModelChoiceField(label="Ingresos proyectos", queryset=DatosFactura.objects.all().values_list('InProyecto').distinct())

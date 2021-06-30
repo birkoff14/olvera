@@ -42,3 +42,8 @@ body {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+.modal-dialog.modal-800 {
+  width: 800px;
+  margin: 30px auto;
+}

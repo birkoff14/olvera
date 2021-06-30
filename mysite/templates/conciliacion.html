@@ -35,7 +35,7 @@
     <form class="form-inline mt-2 mt-md-0 needs-validation" novalidate action="{% url 'conciliacion' %}" name="form1" method="GET">
       {% csrf_token %}
       <div class="form-group">
-        Clientes: <select class="form-control" name="RFC" required>
+        Clientes: <select class="form-select" name="RFC" required>
           <option value="">Seleccione el RFC</option>
           {% for dt in rfc %}
           <option value="{{ dt.RFC }}">{{ dt.RFC }}</option>
