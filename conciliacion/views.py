@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate
-#from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import login as do_login
 from django.contrib.auth import logout as do_logout
 from django.db.models.functions import Substr
 from django.db.models import Sum
 from django.db import connection
 from django.http import HttpResponse
+from django.urls import reverse_lazy
 from django.views.generic import View
 from .models import *
 from .forms import * 
@@ -18,6 +19,7 @@ from sqlalchemy.types import String
 from openpyxl import Workbook
 
 import environ, sys
+
 
 # Create your views here.
 
@@ -147,10 +149,10 @@ def invoice(request):
 
 def invoiceDetail(request, Rfc, Periodo, Mes, Moneda):
 
-    print("RFC: " + Rfc)
-    print("Periodo: " + Periodo)
-    print("Mes: " + Mes)
-    print("Moneda: " + Moneda)
+    #print("RFC: " + Rfc)
+    #print("Periodo: " + Periodo)
+    #print("Mes: " + Mes)
+    #print("Moneda: " + Moneda)
 
     titulo = "Detalle de facturas"
     query = Comprobante.objects.raw(
@@ -162,22 +164,45 @@ def invoiceDetail(request, Rfc, Periodo, Mes, Moneda):
         "and DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) = '" + Mes + "' "
         "and Moneda = '" + Moneda + "'"
     )
-    print(query)
+    #print(query)
 
     context = {
         "titulo": titulo,
         "query": query,
+        "RFC" : Rfc,
+        "Periodo" : Periodo,
+        "Mes" : Mes,
+        "Moneda" : Moneda
     }
 
     return render(request, "detailInvoice.html", context)
 
-def detailFact(request, UUIDInt):
+def detailFact(request, UUIDInt, RFC, Periodo, Mes, Moneda):
     
-    form = addDatos()
-
+    form = addDatos(request.POST or None)
+    
+    if request.method == 'POST':
+        
+        if form.is_valid():
+            print("Si entra")
+            frm = form.save(commit=False)
+            #idUsuario = form.cleaned_data.get("idUsuario")
+            #InProyecto = form.cleaned_data.get("InProyecto")
+            #InContabilidad = form.cleaned_data.get("InContabilidad")
+            #GaProyecto = form.cleaned_data.get("GaProyecto")
+            #GaContabilidad = form.cleaned_data.get("GaContabilidad")
+            #UUID = form.cleaned_data.get("UUIDInt")            
+            frm.save()
+            
+            return redirect('/invoiceDetail/' + RFC + '/' + Periodo + '/' + Mes + '/' + Moneda)
+            
     context = {
         "Titulo" : "Agregar datos adicionales ",
         "UUID" : UUIDInt,
+        "RFC" : RFC,
+        "Periodo" : Periodo,
+        "Mes" : Mes,
+        "Moneda" : Moneda,
         "form" : form,
     }
 

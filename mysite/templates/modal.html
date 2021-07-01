@@ -1,5 +1,7 @@
 <!-- Vertically centered modal -->
 
+{% load crispy_forms_tags %}
+
 <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
         <div class="modal-header">
@@ -10,12 +12,13 @@
         </div>
         <div class="modal-body">
             Factura {{ UUID }}
-        <hr />
-        <form action="#" method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <input type="submit" value="Agregar datos" />
-        </form>
+            <hr />
+            <form name="form1" action="{% url 'detailFact' UUID RFC Periodo Mes Moneda %}" method="POST">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <input onclick="javascript:enviar_formulario()" class='btn btn-primary' type='button'
+                    value='Agregar datos'>
+            </form>
         </div>
         <div class="modal-footer">
             <button type="button" onclick="return cerrar_modal()" class="btn btn-secondary"
@@ -23,3 +26,16 @@
         </div>
     </div>
 </div>
+
+{% block js %}
+<script>
+    document.getElementById("id_UUIDInt").value = '{{ UUID }}'
+    document.getElementById("id_UUIDInt").readOnly = true;
+
+
+    function enviar_formulario() {
+
+        document.form1.submit();
+    }
+</script>
+{% endblock %}

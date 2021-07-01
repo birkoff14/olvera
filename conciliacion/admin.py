@@ -1,6 +1,6 @@
 from django.contrib import admin
 #from import_export.admin import ImportExportModelAdmin
-from .models import InvoiceEmitidas, InvoiceRecibidas, Balance
+from .models import InvoiceEmitidas, InvoiceRecibidas, Balance, DatosFactura
 
 # Register your models here.
 
@@ -18,5 +18,6 @@ class InvoiceEmitidasAdmin(admin.ModelAdmin):
 class BalanceAdmin(admin.ModelAdmin):
     list_display = ('Cuenta', 'Nombre', 'Deudor_1', 'Cargos', 'Abonos', 'Deudor_2', 'timestamp')
 
-#class ExportInvoiceAdmin(ImportExportModelAdmin):
-#    pass
+@admin.register(DatosFactura)
+class DatosFacturaAdmin(admin.ModelAdmin):
+    list_display = ('InProyecto', 'InContabilidad', 'GaProyecto', 'GaContabilidad', 'idUsuario', 'UUIDInt', 'timestamp')

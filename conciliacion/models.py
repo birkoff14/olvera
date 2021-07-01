@@ -1,4 +1,6 @@
 from django.db import models
+from django.conf import settings
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -89,7 +91,6 @@ class InvoiceEmitidas(models.Model):
         verbose_name="Ultima Actualización",
     )
 
-
 class InvoiceRecibidas(models.Model):
     Verificado_ó_Asoc = models.CharField(max_length=150, blank=True)
     Estado_SAT = models.CharField(max_length=150, blank=True)
@@ -175,7 +176,6 @@ class InvoiceRecibidas(models.Model):
         verbose_name="Ultima Actualización",
     )
 
-
 class Balance(models.Model):
     Cuenta = models.CharField(max_length=150, blank=True)
     Nombre = models.CharField(max_length=150, blank=True)
@@ -188,16 +188,8 @@ class Balance(models.Model):
     Mes = models.CharField(max_length=150, blank=True)
     Año = models.CharField(max_length=150, blank=True)
     RFC = models.CharField(max_length=150, blank=True)
-    timestamp = models.DateTimeField(
-        auto_now_add=True, editable=False, null=False, blank=False, verbose_name="Fecha"
-    )
-    last_modified = models.DateTimeField(
-        auto_now=True,
-        editable=False,
-        null=False,
-        blank=False,
-        verbose_name="Ultima Actualización",
-    )
+    timestamp =models.DateTimeField(auto_now=False, auto_now_add=True, verbose_name="Fecha")
+    last_modified = models.DateTimeField(auto_now=False, auto_now_add=True, verbose_name="Ultima Actualización")
 
 
 ################## Nuevas clases
@@ -290,14 +282,44 @@ class TimbreFiscalDigital(models.Model):
     RfcProvCertif = models.CharField(max_length=20, blank=True)
     NoCertificadoSAT = models.CharField(max_length=20, blank=True)
     UUIDInt = models.CharField(max_length=60, blank=True)
+    
+class InProyecto(models.Model):
+    idTipo = models.AutoField(primary_key=True)
+    InProyecto = models.CharField(max_length=100, blank=True)
+    def __str__(self):
+        return self.InProyecto
+    
+class InContabilidad(models.Model):
+    idTipo = models.AutoField(primary_key=True)
+    InContabilidad = models.CharField(max_length=100, blank=True)
+    def __str__(self):
+        return self.InContabilidad
 
+class GaProyecto(models.Model):
+    idTipo = models.AutoField(primary_key=True)
+    GaProyecto = models.CharField(max_length=100, blank=True)
+    def __str__(self):
+        return self.GaProyecto
+    
+class GaContabilidad(models.Model):
+    idTipo = models.AutoField(primary_key=True)
+    GaContabilidad = models.CharField(max_length=100, blank=True)
+    def __str__(self):
+        return self.GaContabilidad
 
 class DatosFactura(models.Model):
-    InProyecto = models.CharField(max_length=5, blank=True)
-    InContabilidad= models.CharField(max_length=5, blank=True)
-    GaProyecto =models.CharField(max_length=5, blank=True)
-    GaContabilidad = models.CharField(max_length=5, blank=True)
-
+    idDato = models.AutoField(primary_key=True, verbose_name="DatosFactura")
+    InProyecto = models.ForeignKey(InProyecto, on_delete=models.CASCADE, null=True, verbose_name="Ingreso proyecto")
+    InContabilidad= models.ForeignKey(InContabilidad, on_delete=models.CASCADE, null=True, verbose_name="Ingreso contabilidad")
+    GaProyecto = models.ForeignKey(GaProyecto, on_delete=models.CASCADE, null=True, verbose_name="Gasto proyecto")
+    GaContabilidad = models.ForeignKey(GaContabilidad, on_delete=models.CASCADE, null=True, verbose_name="Gasto contabilidad")
+    idUsuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    UUIDInt = models.CharField(max_length=60, blank=True)
+    timestamp = models.DateTimeField(auto_now=False, auto_now_add=True, verbose_name="Fecha")
+    
 # Nomina
 
 

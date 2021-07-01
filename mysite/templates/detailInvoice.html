@@ -7,7 +7,7 @@
         class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">{{ titulo }} </h1>
     </div>
-    <div class="bg-light p-5 rounded">
+    <div class="bg-light p-5 rounded">               
 
         <div class="table-responsive">
             <table class="table table-sm">
@@ -39,7 +39,7 @@
                         <td>{{ dt.UUIDInt }}</td>
                         <td>
                             <a class="btn btn-primary"
-                                onclick="return abrir_modal('{% url 'detailFact'  dt.UUIDInt %}');"
+                                onclick="return abrir_modal('{% url 'detailFact' dt.UUIDInt RFC Periodo Mes dt.Moneda %}');"
                                 href="#">
                                 <span class="fa fa-plus-circle"></span> Ver
                             </a>
@@ -57,18 +57,12 @@
 </div>
 
 <script>
-    /*
-    $('#myModal').on('shown.bs.modal', function () {
-      $('#myInput').trigger('focus')
-    })
-    */
-
     function abrir_modal(url) {
         $('#ventana_modal').load(url, function () {
             $(this).modal({
                 backdrop: 'static',
                 keyboard: false
-            })
+            })           
 
             $(this).modal('show');
         });
