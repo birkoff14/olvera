@@ -105,7 +105,7 @@ def invoice(request):
         + "group by Version, YEAR(Fecha), Moneda, Rfc, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) "
         "order by Fecha desc, Nombre "
     )
-
+    
     #print(queryset)
 
     paginator = Paginator(queryset, 15)
@@ -156,9 +156,10 @@ def invoiceDetail(request, Rfc, Periodo, Mes, Moneda):
 
     titulo = "Detalle de facturas"
     query = Comprobante.objects.raw(
-        "select 1 as id, Version, Serie, Folio, Fecha, SubTotal, Total, MetodoPago, Moneda, a.UUIDInt from conciliacion_comprobante a "
+        "select 1 as id, Version, Serie, Folio, Fecha, SubTotal, Total, MetodoPago, Moneda, SUBSTRING_INDEX(b.UUIDInt, '@', 1) UUIDInt, c.idDato from conciliacion_comprobante a "
         "inner join conciliacion_emisor b "
         "on a.UUIDInt = b.UUIDInt "
+        "left join conciliacion_datosfactura c on SUBSTRING_INDEX(a.UUIDInt, '@', 1) = SUBSTRING_INDEX(c.UUIDInt, '@', 1) "
         "where Rfc = '" + Rfc + "' "
         "and YEAR(Fecha) = '" + Periodo + "' "
         "and DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) = '" + Mes + "' "
@@ -207,6 +208,23 @@ def detailFact(request, UUIDInt, RFC, Periodo, Mes, Moneda):
     }
 
     return render(request, "modal.html", context)
+
+def parcialidades(request):
+    
+    qry = Comprobante.objects.raw("select 1 as id, tbl.*, b.UUIDInt, b.Total,  YEAR(b.Fecha) Año, MONTH(b.Fecha) Mes from ("
+                                  "select count(1) NoParc, IdDocumento, Sum(ImpPagado) ImpPagado, Sum(ImpSaldoAnt) ImpSaldoAnt, Sum(ImpSaldoInsoluto) ImpSaldoInsoluto "
+                                  "from conciliacion_doctorelacionado group by IdDocumento "
+                                  ") tbl "
+                                  "inner join conciliacion_comprobante b "
+                                  "on SUBSTRING_INDEX(b.UUIDInt, '@', 1) = tbl.IdDocumento")
+    
+    context = {
+        "Titulo" : "Parcialidades",
+        "qry" : qry,
+        
+    }
+    
+    return render(request, "reporteParcialidad.html", context)
 
 
 def receipts(request):

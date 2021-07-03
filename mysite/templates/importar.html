@@ -69,7 +69,7 @@
         <div class="table-responsive">
             <table class="table table-striped table-sm" id="tblInicial">
                 <thead>
-                    <tr>
+                    <tr align="center">
                         <th>ID</th>
                         <th>Nombre</th>
                         <th>RFC</th>
@@ -84,7 +84,7 @@
                 </thead>
                 <tbody>
                     {% for dt in items %}
-                    <tr>
+                    <tr align="center">
                         <td>{{ forloop.counter }}</td>
                         <td>{{ dt.Nombre }}</td>
                         <td>{{ dt.Rfc }}</td>

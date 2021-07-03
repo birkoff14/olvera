@@ -7,12 +7,12 @@
         class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">{{ titulo }} </h1>
     </div>
-    <div class="bg-light p-5 rounded">               
+    <div class="bg-light p-5 rounded">
 
         <div class="table-responsive">
             <table class="table table-sm">
                 <thead>
-                    <tr>
+                    <tr align="center">
                         <th scope="col">Numero</th>
                         <th scope="col">Serie</th>
                         <th scope="col">Folio</th>
@@ -22,28 +22,41 @@
                         <th scope="col">Metodo de pago</th>
                         <th scope="col">Moneda</th>
                         <th scope="col">UUID</th>
+                        <th scope="col">Check</th>
                         <th scope="col">Datos auxiliares</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for dt in query %}
-                    <tr>
+                    <tr align="center">
                         <th scope="row">{{ forloop.counter }}</th>
                         <td>{{ dt.Serie }}</td>
                         <td>{{ dt.Folio }}</td>
                         <td>{{ dt.Fecha }}</td>
-                        <td>{{ dt.Subtotal }}</td>
+                        <td>{{ dt.SubTotal }}</td>
                         <td>{{ dt.Total }}</td>
                         <td>{{ dt.MetodoPago }}</td>
                         <td>{{ dt.Moneda }}</td>
                         <td>{{ dt.UUIDInt }}</td>
-                        <td>
+                        <td>                            
+                            {% if dt.idDato > 0 %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-check" viewBox="0 0 16 16">
+                                <path
+                                    d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z" />
+                            </svg>
+                            {% endif %}
+                        </td>
+                        <td align="center">
+                            {% if not dt.idDato  %}
                             <a class="btn btn-primary"
                                 onclick="return abrir_modal('{% url 'detailFact' dt.UUIDInt RFC Periodo Mes dt.Moneda %}');"
                                 href="#">
                                 <span class="fa fa-plus-circle"></span> Ver
                             </a>
+                            {% endif %}
                         </td>
+
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -62,7 +75,7 @@
             $(this).modal({
                 backdrop: 'static',
                 keyboard: false
-            })           
+            })
 
             $(this).modal('show');
         });

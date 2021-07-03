@@ -34,7 +34,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.87.35.3','192.168.0.14']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.87.35.3','192.168.0.21']
 
 # Application definition
 
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'import_export',
     'pandas',
+    'bootstrap_modal_forms',
     #'django_static_fontawesome',
     'conciliacion',
 ]
