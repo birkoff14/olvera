@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import View
 from .models import *
-from .forms import * 
+from .forms import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 import pandas as pd
@@ -74,7 +74,6 @@ def invoice(request):
     titulo = "Reporte de facturas emitidas"
 
     if request.POST.get("frmEnvia", "") == "":
-        limit = "LIMIT 15"
         NombreFiltro = ""
         RFCFiltro = ""
         AñoFiltro = ""
@@ -93,27 +92,33 @@ def invoice(request):
         )
 
     queryset = Comprobante.objects.raw(
-        "select 1 as id, Version, YEAR(Fecha) Periodo, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes, Sum(Round(SubTotal, 2)) SubTotal, "
-        "Sum(ROUND(Total, 2)) Total, Moneda, Rfc, Nombre, count(1) Facturas, a.UUIDInt "
-        "from conciliacion_comprobante a inner join conciliacion_emisor b "
-        "on a.UUIDInt = b.UUIDInt "
-        "where Total != '' "
+        "select 1 as id, upper(b.Nombre) Nombre, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, d.TasaOCuota*100 TasaOCuota, d.Importe, b.Rfc, "
+        "Moneda, a.UUIDInt, YEAR(Fecha) Periodo, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes "
+        "from conciliacion_comprobante a "
+        "inner join conciliacion_receptor b "
+        "on a.IDKey = b.IDKey "
+        "inner join conciliacion_concepto c "
+        "on a.IDKey = c.IDKey "
+        "left join conciliacion_traslado d "
+        "on a.IDKey = d.IDKey "
+        "where a.TipoEmRe = 'Emitidas' "
         + RFCFiltro
         + NombreFiltro
         + AñoFiltro
         + MesFiltro
-        + "group by Version, YEAR(Fecha), Moneda, Rfc, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) "
-        "order by Fecha desc, Nombre "
+        + " group by a.UUIDInt "
+        + "order by Fecha desc, Nombre "
     )
-    
-    #print(queryset)
+
+    print(queryset)
 
     paginator = Paginator(queryset, 15)
     page = request.GET.get("page")
 
     rfc = Emisor.objects.raw(
-        "select distinct 1 as id, Rfc from conciliacion_emisor order by 2"
+        "select distinct 1 as id, Rfc from conciliacion_receptor order by 2"
     )
+    # print(rfc)
     anio = Comprobante.objects.raw(
         "select distinct 1 as id, year(Fecha) Año from conciliacion_comprobante order by 2"
     )
@@ -132,7 +137,7 @@ def invoice(request):
 
     context = {
         "titulo": titulo,
-        #"qry": queryset,
+        "qry": queryset,
         "rfc": rfc,
         "anio": anio,
         "mes": mes,
@@ -149,10 +154,10 @@ def invoice(request):
 
 def invoiceDetail(request, Rfc, Periodo, Mes, Moneda):
 
-    #print("RFC: " + Rfc)
-    #print("Periodo: " + Periodo)
-    #print("Mes: " + Mes)
-    #print("Moneda: " + Moneda)
+    # print("RFC: " + Rfc)
+    # print("Periodo: " + Periodo)
+    # print("Mes: " + Mes)
+    # print("Moneda: " + Moneda)
 
     titulo = "Detalle de facturas"
     query = Comprobante.objects.raw(
@@ -165,65 +170,65 @@ def invoiceDetail(request, Rfc, Periodo, Mes, Moneda):
         "and DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) = '" + Mes + "' "
         "and Moneda = '" + Moneda + "'"
     )
-    #print(query)
+    # print(query)
 
     context = {
         "titulo": titulo,
         "query": query,
-        "RFC" : Rfc,
-        "Periodo" : Periodo,
-        "Mes" : Mes,
-        "Moneda" : Moneda
+        "RFC": Rfc,
+        "Periodo": Periodo,
+        "Mes": Mes,
+        "Moneda": Moneda,
     }
 
     return render(request, "detailInvoice.html", context)
 
-def detailFact(request, UUIDInt, RFC, Periodo, Mes, Moneda):
-    
+
+def detailFact(request, UUIDInt):
+
     form = addDatos(request.POST or None)
-    
-    if request.method == 'POST':
-        
+
+    if request.method == "POST":
+
         if form.is_valid():
             print("Si entra")
             frm = form.save(commit=False)
-            #idUsuario = form.cleaned_data.get("idUsuario")
-            #InProyecto = form.cleaned_data.get("InProyecto")
-            #InContabilidad = form.cleaned_data.get("InContabilidad")
-            #GaProyecto = form.cleaned_data.get("GaProyecto")
-            #GaContabilidad = form.cleaned_data.get("GaContabilidad")
-            #UUID = form.cleaned_data.get("UUIDInt")            
+            # idUsuario = form.cleaned_data.get("idUsuario")
+            # InProyecto = form.cleaned_data.get("InProyecto")
+            # InContabilidad = form.cleaned_data.get("InContabilidad")
+            # GaProyecto = form.cleaned_data.get("GaProyecto")
+            # GaContabilidad = form.cleaned_data.get("GaContabilidad")
+            # UUIDInt = form.cleaned_data.get("UUIDInt")
+            # print(UUIDInt)
             frm.save()
-            
-            return redirect('/invoiceDetail/' + RFC + '/' + Periodo + '/' + Mes + '/' + Moneda)
-            
+
+            # return redirect('/invoiceDetail/' + qRFC + '/' + Periodo + '/' + Mes + '/' + Moneda)
+
     context = {
-        "Titulo" : "Agregar datos adicionales ",
-        "UUID" : UUIDInt,
-        "RFC" : RFC,
-        "Periodo" : Periodo,
-        "Mes" : Mes,
-        "Moneda" : Moneda,
-        "form" : form,
+        "Titulo": "Agregar datos adicionales ",
+        "UUID": UUIDInt,
+        "form": form,
     }
 
     return render(request, "modal.html", context)
 
+
 def parcialidades(request):
-    
-    qry = Comprobante.objects.raw("select 1 as id, tbl.*, b.UUIDInt, b.Total,  YEAR(b.Fecha) Año, MONTH(b.Fecha) Mes from ("
-                                  "select count(1) NoParc, IdDocumento, Sum(ImpPagado) ImpPagado, Sum(ImpSaldoAnt) ImpSaldoAnt, Sum(ImpSaldoInsoluto) ImpSaldoInsoluto "
-                                  "from conciliacion_doctorelacionado group by IdDocumento "
-                                  ") tbl "
-                                  "inner join conciliacion_comprobante b "
-                                  "on SUBSTRING_INDEX(b.UUIDInt, '@', 1) = tbl.IdDocumento")
-    
+
+    qry = Comprobante.objects.raw(
+        "select 1 as id, tbl.*, b.UUIDInt, b.Total,  YEAR(b.Fecha) Año, MONTH(b.Fecha) Mes from ("
+        "select count(1) NoParc, IdDocumento, Sum(ImpPagado) ImpPagado, Sum(ImpSaldoAnt) ImpSaldoAnt, Sum(ImpSaldoInsoluto) ImpSaldoInsoluto "
+        "from conciliacion_doctorelacionado group by IdDocumento "
+        ") tbl "
+        "inner join conciliacion_comprobante b "
+        "on SUBSTRING_INDEX(b.UUIDInt, '@', 1) = tbl.IdDocumento"
+    )
+
     context = {
-        "Titulo" : "Parcialidades",
-        "qry" : qry,
-        
+        "Titulo": "Parcialidades",
+        "qry": qry,
     }
-    
+
     return render(request, "reporteParcialidad.html", context)
 
 
@@ -232,13 +237,20 @@ def receipts(request):
     titulo = "Importar reporte de facturas recibidas"
 
     queryset = Comprobante.objects.raw(
-        "select 1 as id, Version, YEAR(Fecha) Periodo, Sum(Round(SubTotal, 2)) SubTotal, Sum(ROUND(Total, 2)) Total, Moneda, Rfc, Nombre "
-        "from conciliacion_comprobante a inner join conciliacion_receptor b "
-        "on a.UUIDInt = b.UUIDInt "
-        "where Total != '' "
-        "group by Version, YEAR(Fecha), Moneda, Rfc "
-        "order by YEAR(Fecha), Nombre "
+        "select 1 as id, upper(b.Nombre) Nombre, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, d.TasaOCuota*100 TasaOCuota, d.Importe, b.Rfc, "
+        "Moneda, a.UUIDInt, YEAR(Fecha) Periodo, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes "
+        "from conciliacion_comprobante a "
+        "inner join conciliacion_receptor b "
+        "on a.IDKey = b.IDKey "
+        "inner join conciliacion_concepto c "
+        "on a.IDKey = c.IDKey "
+        "left join conciliacion_traslado d "
+        "on a.IDKey = d.IDKey "
+        "where a.TipoEmRe = 'Recibidas' "
+        "group by a.UUIDInt order by Fecha desc, Nombre "
     )
+
+    print(queryset)
 
     context = {"titulo": titulo, "qry": queryset}
 
@@ -448,20 +460,20 @@ def conciliacion(request):
                 + campo_1
                 + """) - """
                 + campo_2
-                + """) Diff from (
-                                        select a.id, Cuenta, SUBSTR(a.Fecha_Emision, 4, 2) Mes, SUBSTR(a.Fecha_Emision, 7, 4) Año, a."""
+                + """) Diff, TipoEmRe from (select a.id, b.Cuenta, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes, 
+                YEAR(a.Fecha) Año, a."""
                 + campo_1
                 + """, b."""
                 + campo_2
-                + """ 
-                                        from """
+                + """, b.Rfc, a.TipoEmRe from """
                 + tabla
-                + """ a 
-                                        inner join conciliacion_balance b
-                                        on SUBSTR(a.Fecha_Emision, 4, 2) = case when LENGTH(b.Mes) = 1 then Concat('0', b.Mes) when LENGTH(b.Mes) = 2 then b.Mes end
-                                        and SUBSTR(a.Fecha_Emision, 7, 4) = b.Año
-                                        and a.RFC_Emisor = b.RFC
-                                        and b.RFC = '"""
+                + """ a inner join conciliacion_balance b
+                    on YEAR(a.Fecha) and b.Año 
+                    and MONTH(a.Fecha) = b.Mes
+                    inner join conciliacion_emisor c
+                    on a.IDKey = c.IDKey 
+                    and c.Rfc = b.Rfc
+                    and b.Rfc = '"""
                 + RFC
                 + """'                                    
                                         where Cuenta like CONCAT('"""
@@ -470,8 +482,7 @@ def conciliacion(request):
                                         ) tbl
                                         group by Mes, Año, """
                 + campo_2
-                + """, Cuenta
-                                        """
+                + ", Cuenta, Rfc, TipoEmRe"
             )
             print(r105)
 

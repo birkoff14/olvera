@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import InvoiceEmitidas, DatosFactura, InProyecto, InContabilidad, GaProyecto, GaContabilidad
+from .models import InvoiceEmitidas, DatosFactura, InProyecto, FormaPago
 
 class RFC(forms.ModelForm):
     class Meta:
@@ -19,12 +19,16 @@ class RFC(forms.ModelForm):
 class addDatos(forms.ModelForm):
     class Meta:
         model = DatosFactura
-        fields = ["InProyecto", "InContabilidad", "GaProyecto", "GaContabilidad", "idUsuario", "UUIDInt"]
+        fields = ["ProyectoCont", "FechaPago", "FormaPago", "Notas", "idUsuario", "UUIDInt"]
         
     #InProyecto = forms.ModelChoiceField(label="Ingresos proyectos", queryset=InProyecto.objects.all().values_list('InProyecto').distinct())
-    InProyecto = forms.ModelChoiceField(label="Ingresos Proyecto", queryset=InProyecto.objects.all())
-    InContabilidad = forms.ModelChoiceField(label="Ingresos Contabilidad", queryset=InContabilidad.objects.all())
-    GaProyecto = forms.ModelChoiceField(label="Gastos Proyecto", queryset=GaProyecto.objects.all())
-    GaContabilidad = forms.ModelChoiceField(label="Gastos Contabilidad", queryset=GaContabilidad.objects.all())
+    ProyectoCont = forms.ModelChoiceField(label="Proyectos contabilidad", queryset=InProyecto.objects.all().order_by('InProyecto'))
+    #InContabilidad = forms.ModelChoiceField(label="Ingresos Contabilidad", queryset=InContabilidad.objects.all())
+    #GaProyecto = forms.ModelChoiceField(label="Gastos Proyecto", queryset=GaProyecto.objects.all())
+    #GaContabilidad = forms.ModelChoiceField(label="Gastos Contabilidad", queryset=GaContabilidad.objects.all())
+    #idUsuario = forms.ModelChoiceField(label="Usuario", queryset=User.objects.all())
+    UUIDInt = forms.CharField(widget = forms.HiddenInput())
+    FechaPago = forms.CharField(label='Fecha de pago')
+    FormaPago = forms.ModelChoiceField(label="Forma de pago", queryset=FormaPago.objects.all().order_by('FormaPago'))
+    Notas = forms.CharField(widget=forms.Textarea(attrs={"rows":5, "cols":20}))
     idUsuario = forms.ModelChoiceField(label="Usuario", queryset=User.objects.all())
-    UUIDInt = forms.CharField(label='Descripción')

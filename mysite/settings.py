@@ -70,6 +70,8 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True 
 
+DEFAULT_AUTO_FIELD = 'django.db.models.UUIDField'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

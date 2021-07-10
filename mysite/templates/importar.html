@@ -55,9 +55,10 @@
                         </div>
                         <div class="col">
                         </div>
-                        <button type="submit" class="btn btn-secondary">Aplicar filtro</button>
                     </div>
                 </div>
+                <br /><br />
+                <button type="submit" class="btn btn-secondary">Aplicar filtro</button>
         </form>
         <hr />
         {% if frmTrue %}
@@ -75,10 +76,11 @@
                         <th>RFC</th>
                         <th>Mes - Año</th>
                         <th>SubTotal</th>
+                        <th>IVA</th>
                         <th>Total</th>
                         <th>Moneda</th>
-                        <th>Version</th>
-                        <th>Total Fact</th>
+                        <th>Concepto</th>
+                        <th>Tasa</th>
                         <th>Detalle</th>
                     </tr>
                 </thead>
@@ -86,17 +88,23 @@
                     {% for dt in items %}
                     <tr align="center">
                         <td>{{ forloop.counter }}</td>
-                        <td>{{ dt.Nombre }}</td>
-                        <td>{{ dt.Rfc }}</td>
-                        <td>{{ dt.Mes }} - {{ dt.Periodo }}</td>
-                        <td>{{ dt.SubTotal }}</td>
-                        <td>{{ dt.Total }}</td>
-                        <td>{{ dt.Moneda }}</td>
-                        <td>{{ dt.Version }}</td>
-                        <td>{{ dt.Facturas }}</td>
+                        <td align="left"><small>{{ dt.Nombre }}</small></td>
+                        <td><small>{{ dt.Rfc }}</small></td>
+                        <td><small>{{ dt.Mes }} - {{ dt.Periodo }}</small></td>
+                        <td><small>${{ dt.SubTotal }}</small></td>
+                        <td><small>${{ dt.IVA }}</small></td>
+                        <td><small>${{ dt.Total }}</small></td>
+                        <td><small>{{ dt.Moneda }}</small></td>
+                        <td><small>
+                                <button type="button" class="btn btn-primary btn-sm" data-toggle="tooltip"
+                                    data-placement="top" title="{{ dt.Descripcion }} " readonly>
+                                    Ver concepto
+                                </button>
+                            </small></td>
+                        <td><small>{{ dt.TasaOCuota }}% - ${{ dt.Importe }} </small></td>
                         <td>
-                            <a class="btn btn-primary"
-                                href="{% url 'invoiceDetail' dt.Rfc dt.Periodo dt.Mes dt.Moneda %}">
+                            <a class="btn btn-primary btn-sm"
+                                href="#" onclick="return abrir_modal('{% url 'detailFact' dt.UUIDInt %}')">
                                 <span class="fa fa-plus-circle"></span> Ver
                             </a>
                         </td>
@@ -140,5 +148,42 @@
 
     {% endif %}
 </main>
+<div class="modal fade bd-example-modal-lg" id="ventana_modal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+
+<script>
+    function abrir_modal(url) {
+        $('#ventana_modal').load(url, function () {
+            $(this).modal({
+                backdrop: 'static',
+                keyboard: false
+            })
+
+            $(this).modal('show');
+        });
+
+        return false;
+
+    }
+
+    function cerrar_modal() {
+
+        $('#ventana_modal').modal('hide');
+
+        return false;
+    }
+
+</script>
 
 {% endblock %}

@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib import admin
 
 from conciliacion import views
 from .views import BasicListView
@@ -28,6 +29,10 @@ urlpatterns = [
     path("pagoprov", views.pagoprov, name="pagoprov"),
     path("country-list/", BasicListView.as_view(model=Balance), name="country_list"),
     path("invoiceDetail/<str:Rfc>/<str:Periodo>/<str:Mes>/<str:Moneda>",views.invoiceDetail,name="invoiceDetail"),
-    path("detailFact/<str:UUIDInt>/<str:RFC>/<str:Periodo>/<str:Mes>/<str:Moneda>", views.detailFact, name="detailFact"),
+    #path("detailFact/<str:UUIDInt>/<str:RFC>/<str:Periodo>/<str:Mes>/<str:Moneda>", views.detailFact, name="detailFact"),
+    path("detailFact/<str:UUIDInt>", views.detailFact, name="detailFact"),
     path("parcialidades", views.parcialidades, name="parcialidades")
 ]
+
+
+admin.site.site_header = 'Olvera Contadores'
