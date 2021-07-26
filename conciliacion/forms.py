@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import InvoiceEmitidas, DatosFactura, InProyecto, FormaPago
+from django.forms import ModelChoiceField
 
 class RFC(forms.ModelForm):
     class Meta:
@@ -15,6 +16,10 @@ class RFC(forms.ModelForm):
         RFC_Emisor = self.cleaned_data.get("RFC_Emisor")
         RFC_Emisor.replace("'", "")
         return RFC_Emisor
+    
+class UserModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.get_full_name()
 
 class addDatos(forms.ModelForm):
     class Meta:
@@ -31,4 +36,5 @@ class addDatos(forms.ModelForm):
     FechaPago = forms.CharField(label='Fecha de pago')
     FormaPago = forms.ModelChoiceField(label="Forma de pago", queryset=FormaPago.objects.all().order_by('FormaPago'))
     Notas = forms.CharField(widget=forms.Textarea(attrs={"rows":5, "cols":20}))
-    idUsuario = forms.ModelChoiceField(label="Usuario", queryset=User.objects.all())
+    #idUsuario = forms.ModelChoiceField(label="Usuario", queryset=User.objects.all())
+    idUsuario = UserModelChoiceField(label="Usuario", queryset=User.objects.filter(is_active=True))

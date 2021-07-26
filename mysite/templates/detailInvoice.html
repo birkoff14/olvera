@@ -1,95 +1,48 @@
-{% extends "base.html" %}
-
-{% block content %}
-
-<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-    <div
-        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">{{ titulo }} </h1>
-    </div>
+<div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalCenterTitle">{{ rel }}</h5>
+            <button type="button" onclick="return cerrar_modal()" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            Factura {{ ID }}
     <div class="bg-light p-5 rounded">
 
         <div class="table-responsive">
             <table class="table table-sm">
                 <thead>
                     <tr align="center">
-                        <th scope="col">Numero</th>
-                        <th scope="col">Serie</th>
                         <th scope="col">Folio</th>
-                        <th scope="col">Fecha</th>
-                        <th scope="col">Subtotal</th>
-                        <th scope="col">Total</th>
-                        <th scope="col">Metodo de pago</th>
                         <th scope="col">Moneda</th>
-                        <th scope="col">UUID</th>
-                        <th scope="col">Check</th>
-                        <th scope="col">Datos auxiliares</th>
+                        <th scope="col">Metodo de pago</th>
+                        <th scope="col">No Parcialidad</th>
+                        <th scope="col">Saldo anterior</th>
+                        <th scope="col">Imp Pagado</th>
+                        <th scope="col">Saldo Insoluto</th>                        
                     </tr>
                 </thead>
                 <tbody>
                     {% for dt in query %}
                     <tr align="center">
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td>{{ dt.Serie }}</td>
-                        <td>{{ dt.Folio }}</td>
-                        <td>{{ dt.Fecha }}</td>
-                        <td>{{ dt.SubTotal }}</td>
-                        <td>{{ dt.Total }}</td>
-                        <td>{{ dt.MetodoPago }}</td>
-                        <td>{{ dt.Moneda }}</td>
-                        <td>{{ dt.UUIDInt }}</td>
-                        <td>                            
-                            {% if dt.idDato > 0 %}
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-check" viewBox="0 0 16 16">
-                                <path
-                                    d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z" />
-                            </svg>
-                            {% endif %}
-                        </td>
-                        <td align="center">
-                            {% if not dt.idDato  %}
-                            <a class="btn btn-primary"
-                                onclick="return abrir_modal('{% url 'detailFact' dt.UUIDInt RFC Periodo Mes dt.Moneda %}');"
-                                href="#">
-                                <span class="fa fa-plus-circle"></span> Ver
-                            </a>
-                            {% endif %}
-                        </td>
-
+                        <th scope="row">{{ dt.Folio}} - {{ dt.Serie }}</th>
+                        <td>{{ dt.MonedaDR }} </td>
+                        <td>{{ dt.MetodoDePagoDR }}</td>
+                        <td>{{ dt.NumParcialidad }}</td>
+                        <td>{{ dt.ImpSaldoAnt }}</td>
+                        <td>{{ dt.ImpPagado }}</td>
+                        <td>{{ dt.ImpSaldoInsoluto }}</td>                        
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
-</main>
-<div class="modal fade bd-example-modal-lg" id="ventana_modal" tabindex="-1" role="dialog"
-    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-
 </div>
-
-<script>
-    function abrir_modal(url) {
-        $('#ventana_modal').load(url, function () {
-            $(this).modal({
-                backdrop: 'static',
-                keyboard: false
-            })
-
-            $(this).modal('show');
-        });
-
-        return false;
-
-    }
-
-    function cerrar_modal() {
-
-        $('#ventana_modal').modal('hide');
-
-        return false;
-    }
-
-</script>
-{% endblock %}
+<div class="modal-footer">
+    <button type="button" onclick="return cerrar_modal()" class="btn btn-secondary"
+        data-dismiss="modal">Cerrar</button>
+</div>
+</div>
+</div>

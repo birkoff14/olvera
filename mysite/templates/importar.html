@@ -3,6 +3,7 @@
 {% block content %}
 
 {% load navigation_filters %}
+{% load my_tags %}
 
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
     <div
@@ -65,8 +66,7 @@
         <br />
         <h5>Filtros aplicados:</h5> <br />
         {{ NombreFiltro }} | {{ frmRFC }} | {{ AñoFiltro }} | {{ MesFiltro }}
-        <br /><br />
-        {% endif %}
+        <br /><br />        
         <div class="table-responsive">
             <table class="table table-striped table-sm" id="tblInicial">
                 <thead>
@@ -80,6 +80,7 @@
                         <th>Total</th>
                         <th>Moneda</th>
                         <th>Concepto</th>
+                        <th>Fact Rel</th>
                         <th>Tasa</th>
                         <th>Detalle</th>
                     </tr>
@@ -88,23 +89,29 @@
                     {% for dt in items %}
                     <tr align="center">
                         <td>{{ forloop.counter }}</td>
-                        <td align="left"><small>{{ dt.Nombre }}</small></td>
+                        <td align="left"><small>{{ dt.Nombre }} </small></td>
                         <td><small>{{ dt.Rfc }}</small></td>
                         <td><small>{{ dt.Mes }} - {{ dt.Periodo }}</small></td>
                         <td><small>${{ dt.SubTotal }}</small></td>
                         <td><small>${{ dt.IVA }}</small></td>
                         <td><small>${{ dt.Total }}</small></td>
-                        <td><small>{{ dt.Moneda }}</small></td>
+                        <td><small>{{ dt.Moneda }} {{dt.TipoCambio}} </small></td>
                         <td><small>
                                 <button type="button" class="btn btn-primary btn-sm" data-toggle="tooltip"
                                     data-placement="top" title="{{ dt.Descripcion }} " readonly>
                                     Ver concepto
                                 </button>
                             </small></td>
+                            <td><small>
+                                <a class="btn btn-primary btn-sm"
+                                href="#" onclick="return abrir_modal('{% url 'invoiceDetail' dt.UUIDInt %}');">
+                                <span class="fa fa-plus-circle"></span> Ver relacionadas
+                            </a>
+                            </small></td>
                         <td><small>{{ dt.TasaOCuota }}% - ${{ dt.Importe }} </small></td>
                         <td>
                             <a class="btn btn-primary btn-sm"
-                                href="#" onclick="return abrir_modal('{% url 'detailFact' dt.UUIDInt %}')">
+                                href="#" onclick="return abrir_modal('{% url 'detailFact' dt.UUIDInt %}');">
                                 <span class="fa fa-plus-circle"></span> Ver
                             </a>
                         </td>
@@ -113,6 +120,11 @@
                 </tbody>
             </table>
         </div>
+        {% else %}
+        <div class="row" >            
+            {{ txt }}
+        </div>
+        {% endif %}
     </div>
 
     <!--
@@ -126,14 +138,14 @@
 
     <ul class="pagination">
         {% if items.has_previous %}
-        <li class="page-item"><a href="?page={{ items.previous_page_number }}" class="page-link">
+        <li class="page-item"><a href="?page={{ param_replace }} {{ items.previous_page_number }}" class="page-link">
                 <span aria-hidden="true">&laquo;</span>
             </a></li>
         {% endif %}
 
         {% for page in items.paginator.page_range|page_filter:items %}
         <li class="{% if items.number == page %}page-item active{% endif %}">
-            <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+            <a class="page-link" href="?page={{ param_replace }}{{ page }}">{{ page }}</a>
         </li>
         {% endfor %}
 
@@ -148,7 +160,8 @@
 
     {% endif %}
 </main>
-<div class="modal fade bd-example-modal-lg" id="ventana_modal" tabindex="-1" role="dialog"
+
+<div class="modal fade" id="ventana_modal" tabindex="-1" role="dialog"
     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
 
 </div>

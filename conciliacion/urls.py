@@ -28,10 +28,11 @@ urlpatterns = [
     path("deletefactrec/<int:factrecibidas_id>", views.delete_factrecibidas),
     path("pagoprov", views.pagoprov, name="pagoprov"),
     path("country-list/", BasicListView.as_view(model=Balance), name="country_list"),
-    path("invoiceDetail/<str:Rfc>/<str:Periodo>/<str:Mes>/<str:Moneda>",views.invoiceDetail,name="invoiceDetail"),
+    path("invoiceDetail/<str:UUID>",views.invoiceDetail,name="invoiceDetail"),
     #path("detailFact/<str:UUIDInt>/<str:RFC>/<str:Periodo>/<str:Mes>/<str:Moneda>", views.detailFact, name="detailFact"),
     path("detailFact/<str:UUIDInt>", views.detailFact, name="detailFact"),
-    path("parcialidades", views.parcialidades, name="parcialidades")
+    path("parcialidades", views.parcialidades, name="parcialidades"),
+    path("calcNomina", views.calcNomina, name="calcNomina"),
 ]
 
 

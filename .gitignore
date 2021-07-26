@@ -7,3 +7,6 @@ conciliacion/migrations/*
 *.sql
 mysite/.env
 conciliacion/xml/*
+*.pyc
+log/
+__pycache__/*

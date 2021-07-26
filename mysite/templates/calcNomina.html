@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content %}
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ title }} </h1>
+    </div>
+    <div class="bg-light p-5 rounded">        
+        <form class="needs-validation" action="" method="POST" novalidate>
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="col-md-4 mb-3">
+                    <label for="validationCustomUsername">Ingresa el monto</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroupPrepend">$</span>
+                        </div>
+                        <input type="text" name="monto" class="form-control" id="validationCustomUsername" placeholder=""
+                            aria-describedby="inputGroupPrepend" required>
+                        <div class="invalid-feedback">
+                            Ingresar el monto a calcular.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <button class="btn btn-primary" type="submit">Calcular</button>
+                </div>
+            </div>
+        </form>
+        <hr />
+        <table class="table">
+            <thead class="thead-light">
+                <tr align="center">
+                    <th scope="col">Concepto</th>
+                    <th scope="col">Cálculo Nomina Mensual</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col">Concepto</th>
+                    <th scope="col">Cálculo Nomina Quincenal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dt, dt2 in nomina %}
+                <tr align="center">
+                    <td>Bruto</td>
+                    <td>{{ dt.Bruto|floatformat:"2"|intcomma }}</td>
+                    <td></td>
+                    <td></td>
+                    <td>Bruto</td>
+                    <td>{{ dt2.Bruto|floatformat:"2"|intcomma }}</td>
+                </tr>
+                <tr align="center">
+                    <td>Limite inferior</td>
+                    <td>{{ dt.LI|floatformat:"2"|intcomma }}</td>                    
+                    <td></td>
+                    <td></td>
+                    <td>Limite inferior</td>
+                    <td>{{ dt2.LI|floatformat:"2"|intcomma }}</td>
+                </tr>
+                <tr align="center">
+                    <td>Excedente</td>
+                    <td>{{ dt.Excedente|floatformat:"2"|intcomma }}</td>
+                    <td></td>
+                    <td></td>
+                    <td>Excedente</td>
+                    <td>{{ dt2.Excedente|floatformat:"2"|intcomma }}</td>
+                </tr>
+                <tr align="center">
+                    <td>Tasa</td>
+                    <td>{{ dt.TASA|floatformat:"2"|intcomma}}</td>
+                    <td></td>
+                    <td></td>
+                    <td>Tasa</td>
+                    <td>{{ dt2.TASA|floatformat:"2"|intcomma}}</td>
+                </tr>
+                <tr align="center">
+                    <td>Impto. Marginal</td>
+                    <td>{{ dt.ImpMarginal|floatformat:"2"|intcomma }}</td>
+                    <td></td>
+                    <td></td>
+                    <td>Impto. Marginal</td>
+                    <td>{{ dt2.ImpMarginal|floatformat:"2"|intcomma }}</td>
+                </tr>
+                <tr align="center">
+                    <td>Cuota fija</td>
+                    <td>{{ dt.CuotaFija|floatformat:"2"|intcomma }}</td>
+                    <td></td>
+                    <td></td>
+                    <td>Cuota fija</td>
+                    <td>{{ dt2.CuotaFija|floatformat:"2"|intcomma }}</td>
+                </tr>
+                <tr align="center">
+                    <td>ISR</td>
+                    <td><b>{{ dt.ISR|floatformat:"2"|intcomma }}</b></td>
+                    <td></td>
+                    <td></td>
+                    <td>ISR</td>
+                    <td><b>{{ dt2.ISR|floatformat:"2"|intcomma }}</b></td>
+                </tr>
+                <tr align="center">
+                    <td>Subsidio</td>
+                    <td>{{ dt.Subsidio|floatformat:"2"|intcomma }}</td>
+                    <td></td>
+                    <td></td>
+                    <td>Subsidio</td>
+                    <td>{{ dt2.Subsidio|floatformat:"2"|intcomma }}</td>
+                </tr>
+                <tr align="center">
+                    <td>ISR a retener</td>
+                    <td><b>{{ dt.ISRReten|floatformat:"2"|intcomma }}</b></td>
+                    <td></td>
+                    <td></td>
+                    <td>ISR a retener</td>
+                    <td><b>{{ dt2.ISRReten|floatformat:"2"|intcomma }}</b></td>
+                </tr>
+                <tr align="center">
+                    <td>ISR Quincenal</td>
+                    <td>{{ dt.ISRQuin|floatformat:"2"|intcomma }}</td>
+                    <td></td>
+                    <td></td>
+                    <td>ISR Quincenal</td>
+                    <td>{{ dt2.ISRQuin|floatformat:"2"|intcomma }}</td>
+                </tr>
+                <tr align="center">
+                    <td>Neto</td>
+                    <td>{{ dt.Neto|floatformat:"2"|intcomma }}</td>
+                    <td></td>
+                    <td></td>
+                    <td>Neto</td>
+                    <td>{{ dt2.Neto|floatformat:"2"|intcomma }}</td>
+                </tr>
+                <tr align="center">
+                    <td>Cuota diaria</td>
+                    <td>{{ dt.CuotaDiaria|floatformat:"2"|intcomma }}</td>
+                    <td></td>
+                    <td></td>
+                    <td>Cuota diaria</td>
+                    <td>{{ dt2.CuotaDiaria|floatformat:"2"|intcomma }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+{% endblock %}

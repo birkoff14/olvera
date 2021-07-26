@@ -415,3 +415,25 @@ class SubsidioAlEmpleo(models.Model):
     SubsidioCausado = models.CharField(max_length=50, blank=False)
     UUIDInt = models.CharField(max_length=60, blank=False)
     IDKey = models.IntegerField(db_index=True, blank=False)
+    
+class TablaQuincenal(models.Model):
+    LimiteInferior = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    LimiteSuperior = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    CuotaFija = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    PorcExcedente = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    
+class TablaMensual(models.Model):
+    LimiteInferior = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    LimiteSuperior = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    CuotaFija = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    PorcExcedente = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    
+class TablaSubsidioQ(models.Model):
+    LimiteInferior = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    LimiteSuperior = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    SubsidioAlEmpleo = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+
+class TablaSubsidioM(models.Model):
+    LimiteInferior = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    LimiteSuperior = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    SubsidioAlEmpleo = models.DecimalField(max_digits=19, decimal_places=4, blank=False)

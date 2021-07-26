@@ -1,6 +1,6 @@
 from django.contrib import admin
 #from import_export.admin import ImportExportModelAdmin
-from .models import Balance, DatosFactura, InProyecto, FormaPago
+from .models import Balance, DatosFactura, InProyecto, FormaPago, TablaQuincenal, TablaMensual, TablaSubsidioQ, TablaSubsidioM, Comprobante
 
 # Register your models here.
 
@@ -23,6 +23,9 @@ class BalanceAdmin(admin.ModelAdmin):
 class DatosFacturaAdmin(admin.ModelAdmin):
     list_display = ("ProyectoCont", "FechaPago", "FormaPago", "Notas", "idUsuario", "UUIDInt")
     
+@admin.register(Comprobante)
+class ComprobanteAdmin(admin.ModelAdmin):
+    pass
 
 @admin.register(InProyecto)
 class InProyectoAdmin(admin.ModelAdmin):
@@ -31,3 +34,19 @@ class InProyectoAdmin(admin.ModelAdmin):
 @admin.register(FormaPago)
 class FormaPagoAdmin(admin.ModelAdmin):
     pass
+
+@admin.register(TablaQuincenal)
+class TablaQuincenalAdmin(admin.ModelAdmin):
+    list_display = ("LimiteInferior", "LimiteSuperior", "CuotaFija", "PorcExcedente")
+
+@admin.register(TablaMensual)
+class TablaMensualAdmin(admin.ModelAdmin):
+    list_display = ("LimiteInferior", "LimiteSuperior", "CuotaFija", "PorcExcedente")
+    
+@admin.register(TablaSubsidioQ)
+class TablaSubsidioQAdmin(admin.ModelAdmin):
+    list_display = ("LimiteInferior", "LimiteSuperior", "SubsidioAlEmpleo")
+    
+@admin.register(TablaSubsidioM)
+class TablaSubsidioMAdmin(admin.ModelAdmin):
+    list_display = ("LimiteInferior", "LimiteSuperior", "SubsidioAlEmpleo")

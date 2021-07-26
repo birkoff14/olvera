@@ -70,6 +70,9 @@ def invoice(request):
     frmAño = request.POST.get("Anio", "")
     frmMes = request.POST.get("Mes", "")
     frmTrue = request.POST.get("frmEnvia", "")
+    queryset = ""
+    items = ""
+    txtInicial = ""
 
     titulo = "Reporte de facturas emitidas"
 
@@ -90,30 +93,42 @@ def invoice(request):
             + frmMes
             + "' ,Char(37)) "
         )
-
-    queryset = Comprobante.objects.raw(
-        "select 1 as id, upper(b.Nombre) Nombre, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, d.TasaOCuota*100 TasaOCuota, d.Importe, b.Rfc, "
-        "Moneda, a.UUIDInt, YEAR(Fecha) Periodo, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes "
-        "from conciliacion_comprobante a "
-        "inner join conciliacion_receptor b "
-        "on a.IDKey = b.IDKey "
-        "inner join conciliacion_concepto c "
-        "on a.IDKey = c.IDKey "
-        "left join conciliacion_traslado d "
-        "on a.IDKey = d.IDKey "
-        "where a.TipoEmRe = 'Emitidas' "
-        + RFCFiltro
-        + NombreFiltro
-        + AñoFiltro
-        + MesFiltro
-        + " group by a.UUIDInt "
-        + "order by Fecha desc, Nombre "
-    )
-
-    print(queryset)
-
-    paginator = Paginator(queryset, 15)
-    page = request.GET.get("page")
+        
+        
+    if request.POST.get("frmEnvia", "") == "":
+        txtInicial = "Selecciona un filtro para mostrar las facturas"
+    else:
+        queryset = Comprobante.objects.raw("select 1 as id, upper(b.Nombre) Nombre, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, "
+                                           "d.TasaOCuota*100 TasaOCuota, d.Importe, b.Rfc, a.TipoCambio, "
+                                           "Moneda, a.UUIDInt, YEAR(Fecha) Periodo, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes "
+                                           "from conciliacion_comprobante a "
+                                           "inner join conciliacion_receptor b "
+                                           "on a.IDKey = b.IDKey "
+                                           "inner join conciliacion_concepto c "
+                                           "on a.IDKey = c.IDKey "
+                                           "left join conciliacion_traslado d "
+                                           "on a.IDKey = d.IDKey "
+                                           "where a.TipoEmRe = 'Emitidas' "
+                                           + RFCFiltro
+                                           + NombreFiltro
+                                           + AñoFiltro
+                                           + MesFiltro
+                                           + " group by a.UUIDInt "
+                                           + "order by Fecha desc, Nombre "
+                                           )
+        print(queryset)
+        
+        paginator = Paginator(queryset, 15)
+        page = request.GET.get("page")
+        
+        try:
+            items = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            items = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            items = paginator.page(paginator.num_pages)
 
     rfc = Emisor.objects.raw(
         "select distinct 1 as id, Rfc from conciliacion_receptor order by 2"
@@ -124,16 +139,7 @@ def invoice(request):
     )
     mes = Comprobante.objects.raw(
         'select distinct 1 as id, DATE_FORMAT(Fecha, CONCAT(char(37), "m")) Mes from conciliacion_comprobante order by cast(month(Fecha) as int)'
-    )
-
-    try:
-        items = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        items = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        items = paginator.page(paginator.num_pages)
+    )    
 
     context = {
         "titulo": titulo,
@@ -147,38 +153,27 @@ def invoice(request):
         "MesFiltro": "Mes: " + frmMes,
         "frmTrue": frmTrue,
         "items": items,
+        "txt" : txtInicial,
     }
 
     return render(request, "importar.html", context)
 
 
-def invoiceDetail(request, Rfc, Periodo, Mes, Moneda):
-
-    # print("RFC: " + Rfc)
-    # print("Periodo: " + Periodo)
-    # print("Mes: " + Mes)
-    # print("Moneda: " + Moneda)
+def invoiceDetail(request, UUID):
 
     titulo = "Detalle de facturas"
-    query = Comprobante.objects.raw(
-        "select 1 as id, Version, Serie, Folio, Fecha, SubTotal, Total, MetodoPago, Moneda, SUBSTRING_INDEX(b.UUIDInt, '@', 1) UUIDInt, c.idDato from conciliacion_comprobante a "
-        "inner join conciliacion_emisor b "
-        "on a.UUIDInt = b.UUIDInt "
-        "left join conciliacion_datosfactura c on SUBSTRING_INDEX(a.UUIDInt, '@', 1) = SUBSTRING_INDEX(c.UUIDInt, '@', 1) "
-        "where Rfc = '" + Rfc + "' "
-        "and YEAR(Fecha) = '" + Periodo + "' "
-        "and DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) = '" + Mes + "' "
-        "and Moneda = '" + Moneda + "'"
-    )
-    # print(query)
+    fact = "Facturas relacionadas"
+    
+    query = DoctoRelacionado.objects.raw("select * from conciliacion_doctorelacionado where IdDocumento = '" + UUID + "'")
+    
+    #query = DoctoRelacionado.objects.all()
+    print(query)
 
     context = {
         "titulo": titulo,
-        "query": query,
-        "RFC": Rfc,
-        "Periodo": Periodo,
-        "Mes": Mes,
-        "Moneda": Moneda,
+        "query": query,       
+        "rel" : fact, 
+        "ID" : UUID,
     }
 
     return render(request, "detailInvoice.html", context)
@@ -211,6 +206,58 @@ def detailFact(request, UUIDInt):
     }
 
     return render(request, "modal.html", context)
+
+
+def calcNomina(request):
+    
+    titulo = "Calculadora de Nóminas"
+    monto = request.POST.get("monto", "")
+    montoQ = request.POST.get("monto", "")
+    mensual = ""
+    list = ""
+    #print(monto)    
+    
+    
+    if(monto):
+        
+        mensual = TablaMensual.objects.raw("select 1 as id, Bruto, LI, Excedente, Tasa, (Excedente*Tasa) ImpMarginal, CuotaFija, "
+                                           "(Excedente*Tasa)+CuotaFija as ISR, "
+                                           "Subsidio, (((Excedente*Tasa)+CuotaFija)-Subsidio) ISRReten, (((Excedente*Tasa)+CuotaFija)-Subsidio)/2 ISRQuin, "
+                                           + monto + "-(((Excedente*Tasa)+CuotaFija)-Subsidio) Neto, " 
+                                           + monto + "/30 CuotaDiaria from ( "
+                                           "select " + monto +" as Bruto, LimiteInferior LI, (" + monto +"-LimiteInferior) Excedente, "
+                                           "(select PorcExcedente from conciliacion_tablamensual where LimiteInferior < " + monto + " and LimiteSuperior > " + monto + ") TASA, "
+                                           "(select CuotaFija from conciliacion_tablamensual where LimiteInferior < " + monto + " and LimiteSuperior > " + monto + ") CuotaFija, "
+                                           "(select SubsidioAlEmpleo from conciliacion_tablasubsidiom where LimiteInferior < " + monto + " and LimiteSuperior > " + monto + ") as Subsidio "
+                                           "from conciliacion_tablamensual where LimiteInferior < " + monto + " and LimiteSuperior > " + monto + ") tbl")
+    
+        #print(mensual)
+        
+        quincenal = TablaQuincenal.objects.raw("select 1 as id, Bruto, LI, Excedente, Tasa, (Excedente*Tasa) ImpMarginal, CuotaFija, "
+                                           "(Excedente*Tasa)+CuotaFija as ISR, "
+                                           "Subsidio, (((Excedente*Tasa)+CuotaFija)-Subsidio) ISRReten, (((Excedente*Tasa)+CuotaFija)-Subsidio)/2 ISRQuin, "
+                                           #+ montoQ + "-(((Excedente*Tasa)+CuotaFija)-Subsidio) Neto, " 
+                                           "1500-(((Excedente*Tasa)+CuotaFija)-Subsidio) Neto, "
+                                           + montoQ + "/30 CuotaDiaria from ( "
+                                           "select " + montoQ +"/2 as Bruto, LimiteInferior LI, ((" + montoQ +"/2)-LimiteInferior) Excedente, "
+                                           "(select PorcExcedente from conciliacion_tablaquincenal where LimiteInferior < " + montoQ + "/2 and LimiteSuperior > " + montoQ + "/2) TASA, "
+                                           "(select CuotaFija from conciliacion_tablaquincenal where LimiteInferior < " + montoQ + "/2 and LimiteSuperior > " + montoQ + "/2) CuotaFija, "
+                                           "(select SubsidioAlEmpleo from conciliacion_tablasubsidioq where LimiteInferior < " + montoQ + "/2 and LimiteSuperior > " + montoQ + "/2) as Subsidio "
+                                           "from conciliacion_tablaquincenal where LimiteInferior < " + montoQ + "/2 and LimiteSuperior > " + montoQ + "/2) tbl")
+        
+        print(quincenal)
+        
+        list = zip(mensual, quincenal)
+    
+    context = {
+        "title" : titulo,
+        #"mensual" : mensual,
+        "monto" : monto,
+        #"quincenal" : quincenal,
+        "nomina" : list,
+    }
+    
+    return render(request, "calcNomina.html", context)
 
 
 def parcialidades(request):
