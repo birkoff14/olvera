@@ -70,7 +70,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True 
 
-DEFAULT_AUTO_FIELD = 'django.db.models.UUIDField'
+#DEFAULT_AUTO_FIELD = 'django.db.models.UUIDField'
 
 TEMPLATES = [
     {

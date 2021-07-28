@@ -8,7 +8,10 @@
         class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">{{ title }} </h1>
     </div>
-    <div class="bg-light p-5 rounded">        
+    <div class="bg-light p-5 rounded">
+        <div class="row">
+            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+        </div>
         <form class="needs-validation" action="" method="POST" novalidate>
             {% csrf_token %}
             <div class="form-row">
@@ -18,8 +21,8 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroupPrepend">$</span>
                         </div>
-                        <input type="text" name="monto" class="form-control" id="validationCustomUsername" placeholder=""
-                            aria-describedby="inputGroupPrepend" required>
+                        <input type="text" name="monto" class="form-control" id="validationCustomUsername"
+                            placeholder="" aria-describedby="inputGroupPrepend" required>
                         <div class="invalid-feedback">
                             Ingresar el monto a calcular.
                         </div>
@@ -54,7 +57,7 @@
                 </tr>
                 <tr align="center">
                     <td>Limite inferior</td>
-                    <td>{{ dt.LI|floatformat:"2"|intcomma }}</td>                    
+                    <td>{{ dt.LI|floatformat:"2"|intcomma }}</td>
                     <td></td>
                     <td></td>
                     <td>Limite inferior</td>

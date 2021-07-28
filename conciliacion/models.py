@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
+import uuid
 
 # Create your models here.
 
@@ -213,6 +214,25 @@ class Comprobante(models.Model):
     IDKey = models.IntegerField(db_index=True)
     UUIDInt = models.CharField(max_length=60, blank=False)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True, verbose_name="Fecha")
+
+class ComprobanteUUID(models.Model):            
+    Activo = models.CharField(max_length=20, blank=False)
+    TipoEmRe = models.CharField(max_length=10, blank=False)
+    Version = models.CharField(max_length=5, blank=False)
+    Serie = models.CharField(max_length=20, blank=False)
+    Folio = models.CharField(max_length=50, blank=False)
+    Fecha = models.CharField(max_length=25, blank=False)
+    FormaPago = models.CharField(max_length=100, blank=False)
+    NoCertificado = models.CharField(max_length=50, blank=False)
+    SubTotal = models.CharField(max_length=15, blank=False)
+    TipoCambio = models.CharField(max_length=15, blank=False)
+    Moneda = models.CharField(max_length=50, blank=False)
+    Total = models.CharField(max_length=15, blank=False)
+    TipoDeComprobante = models.CharField(max_length=10, blank=False)
+    MetodoPago = models.CharField(max_length=100, blank=False)
+    LugarExpedicion = models.CharField(max_length=250, blank=False)    
+    UUIDInt = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    timestamp = models.DateTimeField(auto_now=False, auto_now_add=True, verbose_name="Fecha")
     
 class Emisor(models.Model):        
     Rfc = models.CharField(max_length=15, blank=False)
@@ -228,6 +248,12 @@ class Receptor(models.Model):
     UsoCFDI = models.CharField(max_length=5, blank=False)
     UUIDInt = models.CharField(max_length=60, blank=False)
     IDKey = models.IntegerField(db_index=True, blank=False)
+    
+class ReceptorUUID(models.Model):        
+    Rfc = models.CharField(max_length=15, blank=False)
+    Nombre = models.CharField(max_length=250, blank=False)
+    UsoCFDI = models.CharField(max_length=5, blank=False)
+    UUIDInt = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
 class Concepto(models.Model):    
     ClaveProdServ = models.CharField(max_length=15, blank=False)

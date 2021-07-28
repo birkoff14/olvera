@@ -1,5 +1,5 @@
 from django.contrib import admin
-#from import_export.admin import ImportExportModelAdmin
+from import_export.admin import ImportExportModelAdmin
 from .models import Balance, DatosFactura, InProyecto, FormaPago, TablaQuincenal, TablaMensual, TablaSubsidioQ, TablaSubsidioM, Comprobante
 
 # Register your models here.
@@ -36,17 +36,18 @@ class FormaPagoAdmin(admin.ModelAdmin):
     pass
 
 @admin.register(TablaQuincenal)
-class TablaQuincenalAdmin(admin.ModelAdmin):
+#class TablaQuincenalAdmin(admin.ModelAdmin):
+class TablaQuincenalAdmin(ImportExportModelAdmin):
     list_display = ("LimiteInferior", "LimiteSuperior", "CuotaFija", "PorcExcedente")
 
 @admin.register(TablaMensual)
-class TablaMensualAdmin(admin.ModelAdmin):
+class TablaMensualAdmin(ImportExportModelAdmin):
     list_display = ("LimiteInferior", "LimiteSuperior", "CuotaFija", "PorcExcedente")
     
 @admin.register(TablaSubsidioQ)
-class TablaSubsidioQAdmin(admin.ModelAdmin):
+class TablaSubsidioQAdmin(ImportExportModelAdmin):
     list_display = ("LimiteInferior", "LimiteSuperior", "SubsidioAlEmpleo")
     
 @admin.register(TablaSubsidioM)
-class TablaSubsidioMAdmin(admin.ModelAdmin):
+class TablaSubsidioMAdmin(ImportExportModelAdmin):
     list_display = ("LimiteInferior", "LimiteSuperior", "SubsidioAlEmpleo")

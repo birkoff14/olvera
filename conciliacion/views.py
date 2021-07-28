@@ -114,7 +114,7 @@ def invoice(request):
                                            + AñoFiltro
                                            + MesFiltro
                                            + " group by a.UUIDInt "
-                                           + "order by Fecha desc, Nombre "
+                                           + "order by Fecha desc, Nombre Limit 10"
                                            )
         print(queryset)
         
@@ -748,7 +748,7 @@ class ISR_Em(BasicListView):
     model = Balance
 
 
-def export_data(request, cuenta, campo_1, campo_2, tabla, title_1, title_2):
+def export_data(request):
     response = HttpResponse(content_type="application/vnd.ms-excel")
     response["Content-Disposition"] = 'attachment; filename="Conciliacion.xlsx"'
 
@@ -758,36 +758,8 @@ def export_data(request, cuenta, campo_1, campo_2, tabla, title_1, title_2):
 
     # export data to Excel
     # rows = .objects.all().values_list('')
-    rows = InvoiceEmitidas.objects.raw(
-        """select id, Cuenta, Mes, Año, Sum("""
-        + campo_1
-        + """) campo_1, """
-        + campo_2
-        + """ campo_2, (Sum("""
-        + campo_1
-        + """) - """
-        + campo_2
-        + """) Diff from (
-                                    select a.id, Cuenta, SUBSTR(a.Fecha_Emision, 4, 2) Mes, SUBSTR(a.Fecha_Emision, 7, 4) Año, a."""
-        + campo_1
-        + """, b."""
-        + campo_2
-        + """ 
-                                    from """
-        + tabla
-        + """ a 
-                                    inner join conciliacion_balance b
-                                    on SUBSTR(a.Fecha_Emision, 4, 2) = case when LENGTH(b.Mes) = 1 then Concat('0', b.Mes) when LENGTH(b.Mes) = 2 then b.Mes end
-                                    and SUBSTR(a.Fecha_Emision, 7, 4) = b.Año
-                                    where Cuenta = '"""
-        + cuenta
-        + """'
-                                    ) tbl
-                                    group by Mes, Año, """
-        + campo_2
-        + """, Cuenta
-                                    """
-    )
+    rows = Comprobante.objects.filter(TipoEmRe='Recibidas')
+    print(rows.query)
 
     for row_num, row in enumerate(rows, 1):
         # row is just a tuple
