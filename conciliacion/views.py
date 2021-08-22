@@ -210,7 +210,7 @@ def detailFact(request, UUIDInt):
 
 def calcNomina(request):
     
-    titulo = "Calculadora de Nóminas"
+    titulo = "Calculadora ISR Sueldos"
     monto = request.POST.get("monto", "")
     montoQ = request.POST.get("monto", "")
     mensual = ""
@@ -482,7 +482,11 @@ def conciliacion(request):
 
     titulo = "Conciliación"
 
-    rfc = Balance.objects.values("RFC").distinct()
+    rfc = Balance.objects.raw("select DISTINCT 1 as id, a.RFC, b.Nombre "
+                              "from conciliacion_balance a "
+                              "inner join conciliacion_emisor b "
+                              "on a.RFC = b.Rfc "
+                              "group by RFC ")
 
     cuenta = request.GET.get("cuenta", "")
     campo_1 = request.GET.get("campo_1", "")

@@ -38,7 +38,7 @@
         Clientes: <select class="form-select" name="RFC" required>
           <option value="">Seleccione el RFC</option>
           {% for dt in rfc %}
-          <option value="{{ dt.RFC }}">{{ dt.RFC }}</option>
+          <option value="{{ dt.RFC }}">{{ dt.RFC }} - {{ dt.Nombre }} </option>
           {% endfor %}
         </select>
         <div class="invalid-feedback">
@@ -92,7 +92,7 @@
         <input type="hidden" id="tabla" name="tabla" value="">
         <input type="hidden" id="title_1" name="title_1" value="">
         <input type="hidden" id="title_2" name="title_2" value="">
-        <input type="text" id="tipo" name="tipo" value="">
+        <input type="hidden" id="tipo" name="tipo" value="">
         <br /><br />
         <button type="submit" class="btn btn-secondary btn-lg btn-block">Obtener conciliacion</button>
       </div>
@@ -145,7 +145,7 @@
         document.form1.campo_1.value = 'SubTotal'
         document.form1.campo_2.value = 'Abonos'
         document.form1.tabla.value = 'conciliacion_comprobante'
-        document.form1.title_1.value = 'TXML Emitidos Subtotal'
+        document.form1.title_1.value = 'XML Emitidos Subtotal'
         document.form1.title_2.value = 'Total Abonos Ingresos'
         document.form1.tipo.value = 'Emitidas'
         break;
