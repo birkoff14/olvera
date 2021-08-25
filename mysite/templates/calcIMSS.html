@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load mathfilters %}
+
+{% block content %}
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ titulo }} </h1>
+    </div>
+    <div class="bg-light p-5 rounded">
+        <div class="row">
+            <div class="col-4">
+                <form class="needs-validation" action="" method="POST" novalidate>
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div>
+                            <label for="validationCustomUsername">Ingresa el monto bruto</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroupPrepend">$</span>
+                                </div>
+                                <input type="text" name="monto" class="form-control" id="validationCustomUsername"
+                                    placeholder="" aria-describedby="inputGroupPrepend" required>
+                                <div class="invalid-feedback">
+                                    Ingresar el monto a calcular.
+                                </div>
+                            </div>
+                            <div>
+                                <label for="validationCustomUsername">Ingresa el número de días</label>
+                                <input type="text" name="dias" class="form-control" id="validationCustomUsername"
+                                    placeholder="" aria-describedby="inputGroupPrepend" required>
+                                <div class="invalid-feedback">
+                                    Ingresar el número de días.
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary" type="submit">Calcular</button>
+                        </div>
+                    </div>
+                    <input type="hidden" name="frmEnvia" value="1">
+                </form>
+            </div>
+            <div class="col-8">
+                <div class="row align-items-start">
+                    <div class="col d-flex justify-content-center">
+                        Total IMSS Mes
+                    </div>
+                    <div class="col d-flex justify-content-center">
+                        Total RCV (SAR + CEAV BIM)
+                    </div>
+                    <div class="col d-flex justify-content-center">
+                        Subtotal (ACV + Amortización) BIM
+                    </div>
+                    <div class="col d-flex justify-content-center">
+                        Total INFONAVIT
+                    </div>
+                </div>                
+                <div class="row align-items-start">
+                    {% for dt in factInt %}
+                    <div class="col d-flex justify-content-center">
+                        {{ dt.TotalIMSS|floatformat:"2"|intcomma }}
+                    </div>
+                    <div class="col d-flex justify-content-center">
+                        {{ dt.TotalRCV|floatformat:"2"|intcomma }}
+                    </div>
+                    <div class="col d-flex justify-content-center">
+                        {{ dt.ACVPatronal|floatformat:"2"|intcomma }}
+                    </div>
+                    <div class="col d-flex justify-content-center">
+                        {{ dt.TotalInfonavit|floatformat:"2"|intcomma }}
+                    </div>
+                    {% endfor %}
+                </div>       
+                <br />                
+                <div class="row align-items-start">
+                    <div class="col d-flex justify-content-center">
+                        Costo seguridad social
+                    </div>
+                    <div class="col d-flex justify-content-center">
+                        Cuotas Obrero
+                    </div>
+                    <div class="col d-flex justify-content-center">
+                        Cuotas Patronal
+                    </div>
+                    <div class="col d-flex justify-content-center">
+                        Suma Costo Mes
+                    </div>
+                </div>
+                <div class="row align-items-start">
+                    {% for dt in factInt %}
+                    <div class="col d-flex justify-content-center">
+                        {{ dt.CostoSegSoc|floatformat:"2"|intcomma }}
+                    </div>
+                    <div class="col d-flex justify-content-center">
+                        {{ dt.CuotasObrero|floatformat:"2"|intcomma }}
+                    </div>
+                    <div class="col d-flex justify-content-center">
+                        {{ dt.CuotasPatronales|floatformat:"2"|intcomma }}
+                    </div>
+                    <div class="col d-flex justify-content-center">
+                        {{ dt.r }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <hr />
+        <table class="table">
+            <thead class="thead-light">
+                <tr align="center">
+                    <th scope="col">Cuota diaria DOF</th>
+                    <th scope="col">Cálculo Nomina Mensual</th>
+                    <th scope="col">UMA 3 Periodo</th>
+                    <th scope="col">Días</th>
+                    <th scope="col">SDI Topado</th>
+                    <th scope="col">SBC</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dt in factInt %}
+                <tr align="center">
+                    <td>$ {{ dt.DOF|floatformat:"0"|intcomma }}</td>
+                    <td>$ {{ dt.FactIntg|floatformat:"9"|intcomma }}</td>
+                    <td>$ {{ dt.uma3|floatformat:"2"|intcomma }}</td>
+                    <td>{{ dias }} </td>
+                    <td>$ {{ dt.SDI|floatformat:"2"|intcomma }} </td>
+                    <td>$ {{ dias |mul:dt.SDI|floatformat:"2"|intcomma }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br />
+        <hr />
+        <table class="table">
+            <thead>
+                <tr align="center">
+                    <th scope="col">Cuota Fija</th>
+                    <th scope="col">Excedente Patronal</th>
+                    <th scope="col">Prestaciones en dinero patronal</th>
+                    <th scope="col">Gastos Médicos y Pensionados</th>
+                    <th scope="col">Invalidez y vida patronal</th>
+                    <th scope="col">Guarderías y Prestaciones Sociales</th>
+                    <th scope="col">Retiro (SAR)</th>
+                    <th scope="col">CEAV Patrón</th>
+                    <th scope="col">ACV Patronal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dt in factInt %}
+                <tr align="center">
+                    <td>$ {{ dt.CuotaFija|floatformat:"2"|intcomma }} </td>
+                    <td>$ {{ dt.ExcedentePatronal|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.PrestDineat|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.GMPP|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.InvalidezVP|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.Guarderias|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.Retiro|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.CEAVP|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.ACVPatronal|floatformat:"2"|intcomma }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br />
+        <hr />
+        <table class="table">
+            <thead>
+                <tr align="center">
+                    <th scope="col">Excedente Obrero</th>
+                    <th scope="col">Prestaciones en Dinero Obrero</th>
+                    <th scope="col">Gastos Médicos y Pensionados Obrero</th>
+                    <th scope="col">Riesgos de trabajo</th>
+                    <th scope="col">Invalidez y Vida Obrero</th>
+                    <th scope="col">CEAV Obrero</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dt in factInt %}
+                <tr align="center">
+                    <td>$ {{ dt.ExcedenteObrero|floatformat:"2"|intcomma }} </td>
+                    <td>$ {{ dt.PrestObrero|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.GMPO|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.RiesgosTrabajo|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.InvalidezVO|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.CEAVObrero|floatformat:"2"|intcomma }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+{% endblock %}

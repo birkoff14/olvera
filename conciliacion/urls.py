@@ -29,6 +29,7 @@ urlpatterns = [
     path("detailFact/<str:UUIDInt>", views.detailFact, name="detailFact"),
     path("parcialidades", views.parcialidades, name="parcialidades"),
     path("calcNomina", views.calcNomina, name="calcNomina"),
+    path("calcIMSS", views.calcIMSS, name="calcIMSS"),
 ]
 
 

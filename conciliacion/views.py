@@ -259,6 +259,70 @@ def calcNomina(request):
     
     return render(request, "calcNomina.html", context)
 
+def calcIMSS(request):
+
+    title = "Calculadora IMSS"
+    factInt = ""
+    monto = request.POST.get("monto", "")
+    dias = request.POST.get("dias", "")
+    frmTrue = request.POST.get("frmEnvia", "")    
+
+    #datosPatron = DatosPatronIMSS.objects.all()
+
+    if request.POST.get("frmEnvia", "") != "":
+        
+        #factInt = FactorIntegracion.objects.raw("select id, uma, DOF, FactIntg, uma3, case when DOF*FactIntg > (select uma*25 from conciliacion_uma) then "
+        #                                    "(select uma*25 from conciliacion_uma) else DOF*FactIntg  end SDI from (select 1 as id, (select UMA from conciliacion_uma) uma, " + monto + "/30 DOF, "
+        #                                    "((Aguinaldo/365)+((DVacaciones/365)*PVacacional))+Antiguedad FactIntg, (select UMA*3* " + dias + " from conciliacion_uma) uma3 "
+        #                                    "from conciliacion_factorintegracion) tbl")
+
+        factInt = FactorIntegracion.objects.raw("select *, cuotafija+ExcedentePatronal+PrestDineat+GMPP+InvalidezVP+Guarderias+ExcedenteObrero+PrestObrero+GMPO+RiesgosTrabajo+InvalidezVO TotalIMSS, "
+                    "Retiro+CEAVObrero+CEAVP TotalRCV, "
+                    "Retiro+CEAVObrero+CEAVP+acvpatronal TotalInfonavit, "
+                    "(cuotafija+ExcedentePatronal+PrestDineat+GMPP+InvalidezVP+Guarderias+ExcedenteObrero+PrestObrero+GMPO+RiesgosTrabajo+InvalidezVO)+(Retiro+CEAVObrero+CEAVP+acvpatronal) CostoSegSoc, "
+                    "(cuotafija+ExcedentePatronal+PrestDineat+GMPP+InvalidezVP+Guarderias+Retiro+CEAVP+ACVPatronal+riesgostrabajo) CuotasPatronales, "
+                    "(ExcedenteObrero+PrestObrero+GMPO+InvalidezVO+CEAVObrero) CuotasObrero "
+                    "from ("
+                    "select id, uma, DOF, FactIntg, uma3, SDI, cuotafija, "
+                    "case "
+	                "when (((SDI*" + dias + ")-uma3)*(select ExcedentePatronal from conciliacion_datospatronimss)/100) < 0 then 0 else (((SDI*" + dias + ")-uma3)*(select ExcedentePatronal from conciliacion_datospatronimss)/100) "
+                    "end ExcedentePatronal, "
+                    "(SDI*" + dias + ")*(select Prestaciones from conciliacion_datospatronimss)/100 PrestDineat, "
+                    "(SDI*" + dias + ")*(select GMPP from conciliacion_datospatronimss)/100 GMPP, "
+                    "(SDI*" + dias + ")*(select Invalidez from conciliacion_datospatronimss)/100 InvalidezVP, "
+                    "(SDI*" + dias + ")*(select Guarderias from conciliacion_datospatronimss)/100 Guarderias, "
+                    "(SDI*" + dias + ")*(select Retiro from conciliacion_datospatronimss)/100 Retiro, "
+                    "(SDI*" + dias + ")*(select CEAV from conciliacion_datospatronimss)/100 CEAVP, "
+                    "(SDI*" + dias + ")*(select ACVPatronal from conciliacion_datospatronimss)/100 ACVPatronal, "
+                    "case "
+                        "when (((SDI*" + dias + ")-uma3)*(select ExcedenteObrero from conciliacion_datosobrero)/100) < 0 then 0 else " "(((SDI*" + dias + ")-uma3)*(select ExcedenteObrero from conciliacion_datosobrero)/100) "
+                    "end ExcedenteObrero, "
+                    "(SDI*" + dias + ")*(select PrestacionesObrero from conciliacion_datosobrero)/100 PrestObrero, "
+                    "(SDI*" + dias + ")*(select GMPO from conciliacion_datosobrero)/100 GMPO, "
+                    "(SDI*" + dias + ")*(select RiesgosTrabajo from conciliacion_datosobrero) RiesgosTrabajo, "
+                    "(SDI*" + dias + ")*(select InvalidezVO from conciliacion_datosobrero)/100 InvalidezVO, "
+                    "(SDI*" + dias + ")*(select CEAVObrero from conciliacion_datosobrero)/100 CEAVObrero "
+                    "from ( "
+                    "select *, "
+                    "case  "
+                        "when DOF*FactIntg > (select uma*25 from conciliacion_uma) then (select uma*25 from conciliacion_uma) else DOF*FactIntg   "
+                    "end SDI, "
+                    "((uma*" + dias + ")*(select CuotaFija from conciliacion_datospatronimss))/100 CuotaFija "
+                    "from  "
+                    "(select 1 as id, (select UMA from conciliacion_uma) uma, " + monto + "/30 DOF, " "((Aguinaldo/365)+((DVacaciones/365)*PVacacional))+Antiguedad FactIntg, (select UMA*3* " + dias + " from conciliacion_uma) uma3  "
+                    "from conciliacion_factorintegracion)tbl)tbl)tbl")
+
+        print(factInt)        
+    
+    context = {
+        "titulo" : title,
+        "monto" : monto,
+        "factInt" : factInt,        
+        "dias" : dias,
+    }
+
+    return render(request, "calcIMSS.html", context)
+
 
 def parcialidades(request):
 
@@ -549,7 +613,7 @@ def conciliacion(request):
             "rfc": rfc,
         }
     # print(r105)
-    # print(rfc)
+    print(rfc)
 
     return render(request, "conciliacion.html", context)
 

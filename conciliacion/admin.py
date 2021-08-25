@@ -1,6 +1,6 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
-from .models import Balance, DatosFactura, InProyecto, FormaPago, TablaQuincenal, TablaMensual, TablaSubsidioQ, TablaSubsidioM, Comprobante
+from .models import Balance, DatosFactura, InProyecto, FormaPago, TablaQuincenal, TablaMensual, TablaSubsidioQ, TablaSubsidioM, Comprobante, FactorIntegracion, DatosPatronIMSS, DatosObrero
 
 # Register your models here.
 
@@ -51,3 +51,15 @@ class TablaSubsidioQAdmin(ImportExportModelAdmin):
 @admin.register(TablaSubsidioM)
 class TablaSubsidioMAdmin(ImportExportModelAdmin):
     list_display = ("LimiteInferior", "LimiteSuperior", "SubsidioAlEmpleo")
+
+@admin.register(FactorIntegracion)
+class FactorIntegracionAdmin(ImportExportModelAdmin):
+    list_display = ("Aguinaldo", "PVacacional", "DVacaciones", "Antiguedad")
+
+@admin.register(DatosPatronIMSS)
+class DatosPatronIMSSAdmin(ImportExportModelAdmin):
+    list_display = ('CuotaFija', 'ExcedentePatronal', 'Prestaciones', 'GMPP', 'Invalidez', 'Guarderias', 'Retiro', 'CEAV', 'ACVPatronal')
+
+@admin.register(DatosObrero)
+class DatosObreroAdmin(ImportExportModelAdmin):
+    list_display = ('ExcedenteObrero', 'PrestacionesObrero', 'GMPO', 'RiesgosTrabajo', 'InvalidezVO', 'CEAVObrero')

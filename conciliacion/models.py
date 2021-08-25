@@ -463,3 +463,34 @@ class TablaSubsidioM(models.Model):
     LimiteInferior = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
     LimiteSuperior = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
     SubsidioAlEmpleo = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+
+class FactorIntegracion(models.Model):
+    Aguinaldo = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    PVacacional = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    DVacaciones = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    Antiguedad = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+
+class UMA(models.Model):
+    SDI = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    UMA = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+
+class DatosPatronIMSS(models.Model): 
+    CuotaFija = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    ExcedentePatronal = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    Prestaciones = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    GMPP = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    Invalidez = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    Guarderias = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    Retiro = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    CEAV = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    ACVPatronal = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+
+class DatosObrero(models.Model):
+    ExcedenteObrero = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    PrestacionesObrero = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    GMPO = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    RiesgosTrabajo = models.DecimalField(max_digits=19, decimal_places=7, blank=False)
+    InvalidezVO = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+    CEAVObrero = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+
+

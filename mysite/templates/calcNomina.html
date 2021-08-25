@@ -49,99 +49,99 @@
                 {% for dt, dt2 in nomina %}
                 <tr align="center">
                     <td>Bruto</td>
-                    <td>{{ dt.Bruto|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.Bruto|floatformat:"2"|intcomma }}</td>
                     <td></td>
                     <td></td>
                     <td>Bruto</td>
-                    <td>{{ dt2.Bruto|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt2.Bruto|floatformat:"2"|intcomma }}</td>
                 </tr>
                 <tr align="center">
                     <td>Limite inferior</td>
-                    <td>{{ dt.LI|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.LI|floatformat:"2"|intcomma }}</td>
                     <td></td>
                     <td></td>
                     <td>Limite inferior</td>
-                    <td>{{ dt2.LI|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt2.LI|floatformat:"2"|intcomma }}</td>
                 </tr>
                 <tr align="center">
                     <td>Excedente</td>
-                    <td>{{ dt.Excedente|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.Excedente|floatformat:"2"|intcomma }}</td>
                     <td></td>
                     <td></td>
                     <td>Excedente</td>
-                    <td>{{ dt2.Excedente|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt2.Excedente|floatformat:"2"|intcomma }}</td>
                 </tr>
                 <tr align="center">
                     <td>Tasa</td>
-                    <td>{{ dt.TASA|floatformat:"2"|intcomma}}</td>
+                    <td>$ {{ dt.TASA|floatformat:"2"|intcomma}}</td>
                     <td></td>
                     <td></td>
                     <td>Tasa</td>
-                    <td>{{ dt2.TASA|floatformat:"2"|intcomma}}</td>
+                    <td>$ {{ dt2.TASA|floatformat:"2"|intcomma}}</td>
                 </tr>
                 <tr align="center">
                     <td>Impto. Marginal</td>
-                    <td>{{ dt.ImpMarginal|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.ImpMarginal|floatformat:"2"|intcomma }}</td>
                     <td></td>
                     <td></td>
                     <td>Impto. Marginal</td>
-                    <td>{{ dt2.ImpMarginal|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt2.ImpMarginal|floatformat:"2"|intcomma }}</td>
                 </tr>
                 <tr align="center">
                     <td>Cuota fija</td>
-                    <td>{{ dt.CuotaFija|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.CuotaFija|floatformat:"2"|intcomma }}</td>
                     <td></td>
                     <td></td>
                     <td>Cuota fija</td>
-                    <td>{{ dt2.CuotaFija|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt2.CuotaFija|floatformat:"2"|intcomma }}</td>
                 </tr>
                 <tr align="center">
                     <td>ISR</td>
-                    <td><b>{{ dt.ISR|floatformat:"2"|intcomma }}</b></td>
+                    <td><b>$ {{ dt.ISR|floatformat:"2"|intcomma }}</b></td>
                     <td></td>
                     <td></td>
                     <td>ISR</td>
-                    <td><b>{{ dt2.ISR|floatformat:"2"|intcomma }}</b></td>
+                    <td><b>$ {{ dt2.ISR|floatformat:"2"|intcomma }}</b></td>
                 </tr>
                 <tr align="center">
                     <td>Subsidio</td>
-                    <td>{{ dt.Subsidio|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.Subsidio|floatformat:"2"|intcomma }}</td>
                     <td></td>
                     <td></td>
                     <td>Subsidio</td>
-                    <td>{{ dt2.Subsidio|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt2.Subsidio|floatformat:"2"|intcomma }}</td>
                 </tr>
                 <tr align="center">
                     <td>ISR a retener</td>
-                    <td><b>{{ dt.ISRReten|floatformat:"2"|intcomma }}</b></td>
+                    <td><b>$ {{ dt.ISRReten|floatformat:"2"|intcomma }}</b></td>
                     <td></td>
                     <td></td>
                     <td>ISR a retener</td>
-                    <td><b>{{ dt2.ISRReten|floatformat:"2"|intcomma }}</b></td>
+                    <td><b>$ {{ dt2.ISRReten|floatformat:"2"|intcomma }}</b></td>
                 </tr>
                 <tr align="center">
                     <td>ISR Quincenal</td>
-                    <td>{{ dt.ISRQuin|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.ISRQuin|floatformat:"2"|intcomma }}</td>
                     <td></td>
                     <td></td>
                     <td>ISR Quincenal</td>
-                    <td>{{ dt2.ISRQuin|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt2.ISRQuin|floatformat:"2"|intcomma }}</td>
                 </tr>
                 <tr align="center">
                     <td>Neto</td>
-                    <td>{{ dt.Neto|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.Neto|floatformat:"2"|intcomma }}</td>
                     <td></td>
                     <td></td>
                     <td>Neto</td>
-                    <td>{{ dt2.Neto|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt2.Neto|floatformat:"2"|intcomma }}</td>
                 </tr>
                 <tr align="center">
                     <td>Cuota diaria</td>
-                    <td>{{ dt.CuotaDiaria|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt.CuotaDiaria|floatformat:"2"|intcomma }}</td>
                     <td></td>
                     <td></td>
                     <td>Cuota diaria</td>
-                    <td>{{ dt2.CuotaDiaria|floatformat:"2"|intcomma }}</td>
+                    <td>$ {{ dt2.CuotaDiaria|floatformat:"2"|intcomma }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
