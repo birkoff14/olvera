@@ -12,6 +12,7 @@ from django.views.generic import View
 from .models import *
 from .forms import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.auth.decorators import login_required
 
 import pandas as pd
 from sqlalchemy import create_engine
@@ -29,7 +30,6 @@ env = environ.Env(
 )
 # reading .env file
 environ.Env.read_env()
-
 
 def login(request):
     form = AuthenticationForm()
@@ -51,7 +51,7 @@ def logout(request):
     do_logout(request)
     return redirect("/")
 
-
+@login_required(login_url='/')
 def menu(request):
 
     titulo = "Olvera Contadores & Asesores"
@@ -62,7 +62,7 @@ def menu(request):
 
     return render(request, "menu.html", context)
 
-
+@login_required(login_url='/')
 def invoice(request):
 
     frmNombre = request.POST.get("Cliente", "")
@@ -178,7 +178,6 @@ def invoiceDetail(request, UUID):
 
     return render(request, "detailInvoice.html", context)
 
-
 def detailFact(request, UUIDInt):
 
     form = addDatos(request.POST or None)
@@ -188,17 +187,8 @@ def detailFact(request, UUIDInt):
         if form.is_valid():
             print("Si entra")
             frm = form.save(commit=False)
-            # idUsuario = form.cleaned_data.get("idUsuario")
-            # InProyecto = form.cleaned_data.get("InProyecto")
-            # InContabilidad = form.cleaned_data.get("InContabilidad")
-            # GaProyecto = form.cleaned_data.get("GaProyecto")
-            # GaContabilidad = form.cleaned_data.get("GaContabilidad")
-            # UUIDInt = form.cleaned_data.get("UUIDInt")
-            # print(UUIDInt)
             frm.save()
-
-            # return redirect('/invoiceDetail/' + qRFC + '/' + Periodo + '/' + Mes + '/' + Moneda)
-
+    
     context = {
         "Titulo": "Agregar datos adicionales ",
         "UUID": UUIDInt,
@@ -207,7 +197,7 @@ def detailFact(request, UUIDInt):
 
     return render(request, "modal.html", context)
 
-
+@login_required(login_url='/')
 def calcNomina(request):
     
     titulo = "Calculadora ISR Sueldos"
@@ -259,6 +249,7 @@ def calcNomina(request):
     
     return render(request, "calcNomina.html", context)
 
+@login_required(login_url='/')
 def calcIMSS(request):
 
     title = "Calculadora IMSS"
@@ -342,28 +333,98 @@ def parcialidades(request):
 
     return render(request, "reporteParcialidad.html", context)
 
-
+@login_required(login_url='/')
 def receipts(request):
 
-    titulo = "Importar reporte de facturas recibidas"
+    frmNombre = request.POST.get("Cliente", "")
+    frmRFC = request.POST.get("RFC", "")
+    frmAño = request.POST.get("Anio", "")
+    frmMes = request.POST.get("Mes", "")
+    frmTrue = request.POST.get("frmEnvia", "")
+    queryset = ""
+    items = ""
+    txtInicial = ""
 
-    queryset = Comprobante.objects.raw(
-        "select 1 as id, upper(b.Nombre) Nombre, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, d.TasaOCuota*100 TasaOCuota, d.Importe, b.Rfc, "
-        "Moneda, a.UUIDInt, YEAR(Fecha) Periodo, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes "
-        "from conciliacion_comprobante a "
-        "inner join conciliacion_receptor b "
-        "on a.IDKey = b.IDKey "
-        "inner join conciliacion_concepto c "
-        "on a.IDKey = c.IDKey "
-        "left join conciliacion_traslado d "
-        "on a.IDKey = d.IDKey "
-        "where a.TipoEmRe = 'Recibidas' "
-        "group by a.UUIDInt order by Fecha desc, Nombre "
+    titulo = "Reporte de facturas recibidas"
+
+    if request.POST.get("frmEnvia", "") == "":
+        NombreFiltro = ""
+        RFCFiltro = ""
+        AñoFiltro = ""
+        MesFiltro = ""
+    else:
+        limit = ""
+        RFCFiltro = "and Rfc like CONCAT(char(37), '" + frmRFC + "' ,Char(37)) "
+        NombreFiltro = (
+            "and Nombre like CONCAT(char(37), '" + frmNombre + "' ,Char(37)) "
+        )
+        AñoFiltro = "and YEAR(Fecha) like CONCAT(char(37), '" + frmAño + "' ,Char(37)) "
+        MesFiltro = (
+            "and DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) like CONCAT(char(37), '"
+            + frmMes
+            + "' ,Char(37)) "
+        )
+
+    if request.POST.get("frmEnvia", "") == "":
+        txtInicial = "Selecciona un filtro para mostrar las facturas"
+    else:
+        queryset = Comprobante.objects.raw("select 1 as id, upper(b.Nombre) Nombre, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, "
+                                           "d.TasaOCuota*100 TasaOCuota, d.Importe, b.Rfc, a.TipoCambio, "
+                                           "Moneda, a.UUIDInt, YEAR(Fecha) Periodo, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes "
+                                           "from conciliacion_comprobante a "
+                                           "inner join conciliacion_receptor b "
+                                           "on a.IDKey = b.IDKey "
+                                           "inner join conciliacion_concepto c "
+                                           "on a.IDKey = c.IDKey "
+                                           "left join conciliacion_traslado d "
+                                           "on a.IDKey = d.IDKey "
+                                           "where a.TipoEmRe = 'Recibidas' "
+                                           + RFCFiltro
+                                           + NombreFiltro
+                                           + AñoFiltro
+                                           + MesFiltro
+                                           + " group by a.UUIDInt "
+                                           + "order by Fecha desc, Nombre Limit 10"
+                                           )
+        #print(queryset)
+        
+        paginator = Paginator(queryset, 15)
+        page = request.GET.get("page")
+        
+        try:
+            items = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            items = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            items = paginator.page(paginator.num_pages)
+
+    rfc = Emisor.objects.raw(
+        "select distinct 1 as id, Rfc from conciliacion_receptor order by 2"
     )
+    print(rfc)
+    anio = Comprobante.objects.raw(
+        "select distinct 1 as id, year(Fecha) Año from conciliacion_comprobante order by 2"
+    )
+    mes = Comprobante.objects.raw(
+        'select distinct 1 as id, DATE_FORMAT(Fecha, CONCAT(char(37), "m")) Mes from conciliacion_comprobante order by cast(month(Fecha) as int)'
+    ) 
 
-    print(queryset)
-
-    context = {"titulo": titulo, "qry": queryset}
+    context = {
+        "titulo": titulo,
+        "qry": queryset,
+        "rfc": rfc,
+        "anio": anio,
+        "mes": mes,
+        "NombreFiltro": "Nombre: " + frmNombre,
+        "RFCFiltro": "RFC: " + frmRFC,
+        "AñoFiltro": "Año: " + frmAño,
+        "MesFiltro": "Mes: " + frmMes,
+        "frmTrue": frmTrue,
+        "items": items,
+        "txt" : txtInicial,
+    }
 
     return render(request, "recibidas.html", context)
 
@@ -431,7 +492,7 @@ def repRecibidas(request):
 
     return render(request, "factRecibidas.html", context)
 
-
+@login_required(login_url='/')
 def importBalanza(mes, new_conciliacion, txt):
 
     fname = new_conciliacion
@@ -458,7 +519,7 @@ def importBalanza(mes, new_conciliacion, txt):
 
         return txt, e
 
-
+@login_required(login_url='/')
 def impConciliacion(request):
 
     titulo = "Importar balanza de comprobación"
@@ -541,7 +602,7 @@ def impConciliacion(request):
 
     return render(request, "importBalanza.html", context)
 
-
+@login_required(login_url='/')
 def conciliacion(request):
 
     titulo = "Conciliación"
@@ -617,7 +678,7 @@ def conciliacion(request):
 
     return render(request, "conciliacion.html", context)
 
-
+@login_required(login_url='/')
 def impbalanza(request):
 
     titulo = "Archivos cargados"

@@ -58,10 +58,11 @@
                         </div>
                     </div>
                 </div>
-                <br /><br />
+                <br /><br />                
                 <button type="submit" class="btn btn-secondary">Aplicar filtro</button>
         </form>
         <hr />
+        <div id="invoice"></div>
         {% if frmTrue %}
         <br />
         <h5>Filtros aplicados:</h5> <br />
@@ -180,7 +181,10 @@
         $('#ventana_modal').load(url, function () {
             $(this).modal({
                 backdrop: 'static',
-                keyboard: false
+                keyboard: false,
+                success: function () {
+                    document.getElementById("invoice") = 'block';
+                }
             })
 
             $(this).modal('show');

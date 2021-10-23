@@ -10,3 +10,5 @@ conciliacion/xml/*
 *.pyc
 log/
 __pycache__/*
+conciliacion/.env
+mysite/.env
