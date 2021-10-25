@@ -194,6 +194,8 @@ class Balance(models.Model):
 
 ################## Nuevas clases
 
+class RFCClientes(models.Model):
+    Rfc = models.CharField(max_length=20, blank=False)
 
 class Comprobante(models.Model):        
     Activo = models.CharField(max_length=20, blank=False)
@@ -214,25 +216,6 @@ class Comprobante(models.Model):
     IDKey = models.IntegerField(db_index=True)
     UUIDInt = models.CharField(max_length=60, blank=False)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True, verbose_name="Fecha")
-
-class ComprobanteUUID(models.Model):            
-    Activo = models.CharField(max_length=20, blank=False)
-    TipoEmRe = models.CharField(max_length=10, blank=False)
-    Version = models.CharField(max_length=5, blank=False)
-    Serie = models.CharField(max_length=20, blank=False)
-    Folio = models.CharField(max_length=50, blank=False)
-    Fecha = models.CharField(max_length=25, blank=False)
-    FormaPago = models.CharField(max_length=100, blank=False)
-    NoCertificado = models.CharField(max_length=50, blank=False)
-    SubTotal = models.CharField(max_length=15, blank=False)
-    TipoCambio = models.CharField(max_length=15, blank=False)
-    Moneda = models.CharField(max_length=50, blank=False)
-    Total = models.CharField(max_length=15, blank=False)
-    TipoDeComprobante = models.CharField(max_length=10, blank=False)
-    MetodoPago = models.CharField(max_length=100, blank=False)
-    LugarExpedicion = models.CharField(max_length=250, blank=False)    
-    UUIDInt = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    timestamp = models.DateTimeField(auto_now=False, auto_now_add=True, verbose_name="Fecha")
     
 class Emisor(models.Model):        
     Rfc = models.CharField(max_length=15, blank=False)
@@ -241,19 +224,12 @@ class Emisor(models.Model):
     UUIDInt = models.CharField(max_length=60, blank=False)
     IDKey = models.IntegerField(db_index=True, blank=False) 
 
-
 class Receptor(models.Model):        
     Rfc = models.CharField(max_length=15, blank=False)
     Nombre = models.CharField(max_length=250, blank=False)
     UsoCFDI = models.CharField(max_length=5, blank=False)
     UUIDInt = models.CharField(max_length=60, blank=False)
     IDKey = models.IntegerField(db_index=True, blank=False)
-    
-class ReceptorUUID(models.Model):        
-    Rfc = models.CharField(max_length=15, blank=False)
-    Nombre = models.CharField(max_length=250, blank=False)
-    UsoCFDI = models.CharField(max_length=5, blank=False)
-    UUIDInt = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
 class Concepto(models.Model):    
     ClaveProdServ = models.CharField(max_length=15, blank=False)
@@ -369,7 +345,6 @@ class DatosFactura(models.Model):
     
 # Nomina
 
-
 class Nomina(models.Model):
     FechaFinalPago = models.CharField(max_length=50, blank=False)
     FechaInicialPago = models.CharField(max_length=50, blank=False)
@@ -436,7 +411,6 @@ class OtroPago(models.Model):
     UUIDInt = models.CharField(max_length=60, blank=False)
     IDKey = models.IntegerField(db_index=True, blank=False)
 
-
 class SubsidioAlEmpleo(models.Model):
     SubsidioCausado = models.CharField(max_length=50, blank=False)
     UUIDInt = models.CharField(max_length=60, blank=False)
@@ -492,5 +466,3 @@ class DatosObrero(models.Model):
     RiesgosTrabajo = models.DecimalField(max_digits=19, decimal_places=7, blank=False)
     InvalidezVO = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
     CEAVObrero = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
-
-

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load humanize %}
 {% block content %}
 
 {% load navigation_filters %}
@@ -66,14 +66,14 @@
         {% if frmTrue %}
         <br />
         <h5>Filtros aplicados:</h5> <br />
-        {{ NombreFiltro }} | {{ frmRFC }} | {{ AñoFiltro }} | {{ MesFiltro }}
+        {{ NombreFiltro }} | {{ RFCFiltro }} | {{ AñoFiltro }} | {{ MesFiltro }}
         <br /><br />        
         <div class="table-responsive">
             <table class="table table-striped table-sm" id="tblInicial">
                 <thead>
                     <tr align="center">
                         <th>ID</th>
-                        <th>Nombre</th>
+                        <th>Nombre</th>                        
                         <th>RFC</th>
                         <th>Mes - Año</th>
                         <th>SubTotal</th>
@@ -89,24 +89,24 @@
                 <tbody>
                     {% for dt in items %}
                     <tr align="center">
-                        <td>{{ forloop.counter }}</td>
-                        <td align="left"><small>{{ dt.Nombre }} </small></td>
+                        <td>{{ forloop.counter }}</td>                        
+                        <td align="left"><small>{{ dt.NombreR }} </small></td>
                         <td><small>{{ dt.Rfc }}</small></td>
                         <td><small>{{ dt.Mes }} - {{ dt.Periodo }}</small></td>
-                        <td><small>${{ dt.SubTotal }}</small></td>
-                        <td><small>${{ dt.IVA }}</small></td>
-                        <td><small>${{ dt.Total }}</small></td>
+                        <td><small>${{ dt.SubTotal|floatformat:"2"|intcomma }}</small></td>
+                        <td><small>${{ dt.IVA|floatformat:"2"|intcomma }}</small></td>
+                        <td><small>${{ dt.Total|floatformat:"2"|intcomma }}</small></td>
                         <td><small>{{ dt.Moneda }} {{dt.TipoCambio}} </small></td>
                         <td><small>
                                 <button type="button" class="btn btn-primary btn-sm" data-toggle="tooltip"
                                     data-placement="top" title="{{ dt.Descripcion }} " readonly>
-                                    Ver concepto
+                                    Concepto
                                 </button>
                             </small></td>
                             <td><small>
                                 <a class="btn btn-primary btn-sm"
                                 href="#" onclick="return abrir_modal('{% url 'invoiceDetail' dt.UUIDInt %}');">
-                                <span class="fa fa-plus-circle"></span> Ver relacionadas
+                                <span class="fa fa-plus-circle"></span> Relacionadas
                             </a>
                             </small></td>
                         <td><small>{{ dt.TasaOCuota }}% - ${{ dt.Importe }} </small></td>
@@ -133,7 +133,7 @@
         {% for item in items %}
         <li>{{ item.Nombre }}</li>
         {% endfor %}
-    </ul>-->
+    </ul>
 
     {% if items.has_next or items.has_previous %}
 
@@ -160,6 +160,7 @@
     </ul>
 
     {% endif %}
+-->
 </main>
 
 <div class="modal fade" id="ventana_modal" tabindex="-1" role="dialog"

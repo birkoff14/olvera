@@ -83,9 +83,9 @@ def invoice(request):
         MesFiltro = ""
     else:
         limit = ""
-        RFCFiltro = "and Rfc like CONCAT(char(37), '" + frmRFC + "' ,Char(37)) "
+        RFCFiltro = "and e.Rfc like CONCAT(char(37), '" + frmRFC + "' ,Char(37)) "
         NombreFiltro = (
-            "and Nombre like CONCAT(char(37), '" + frmNombre + "' ,Char(37)) "
+            "and e.Nombre like CONCAT(char(37), '" + frmNombre + "' ,Char(37)) "
         )
         AñoFiltro = "and YEAR(Fecha) like CONCAT(char(37), '" + frmAño + "' ,Char(37)) "
         MesFiltro = (
@@ -98,7 +98,7 @@ def invoice(request):
     if request.POST.get("frmEnvia", "") == "":
         txtInicial = "Selecciona un filtro para mostrar las facturas"
     else:
-        queryset = Comprobante.objects.raw("select 1 as id, upper(b.Nombre) Nombre, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, "
+        queryset = Comprobante.objects.raw("select 1 as id, e.Nombre NombreE, e.Rfc RFCE, upper(b.Nombre) NombreR, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, "
                                            "d.TasaOCuota*100 TasaOCuota, d.Importe, b.Rfc, a.TipoCambio, "
                                            "Moneda, a.UUIDInt, YEAR(Fecha) Periodo, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes "
                                            "from conciliacion_comprobante a "
@@ -108,13 +108,14 @@ def invoice(request):
                                            "on a.IDKey = c.IDKey "
                                            "left join conciliacion_traslado d "
                                            "on a.IDKey = d.IDKey "
+                                           "inner join conciliacion_emisor e on a.IDKey = e.IDKey "
                                            "where a.TipoEmRe = 'Emitidas' "
                                            + RFCFiltro
                                            + NombreFiltro
                                            + AñoFiltro
                                            + MesFiltro
                                            + " group by a.UUIDInt "
-                                           + "order by Fecha desc, Nombre Limit 10"
+                                           + "order by Fecha desc, e.Nombre"
                                            )
         print(queryset)
         
@@ -131,7 +132,7 @@ def invoice(request):
             items = paginator.page(paginator.num_pages)
 
     rfc = Emisor.objects.raw(
-        "select distinct 1 as id, Rfc from conciliacion_receptor order by 2"
+        "select distinct 1 as id, Rfc from conciliacion_rfcclientes order by 2"
     )
     # print(rfc)
     anio = Comprobante.objects.raw(
@@ -354,9 +355,9 @@ def receipts(request):
         MesFiltro = ""
     else:
         limit = ""
-        RFCFiltro = "and Rfc like CONCAT(char(37), '" + frmRFC + "' ,Char(37)) "
+        RFCFiltro = "and b.Rfc like CONCAT(char(37), '" + frmRFC + "' ,Char(37)) "
         NombreFiltro = (
-            "and Nombre like CONCAT(char(37), '" + frmNombre + "' ,Char(37)) "
+            "and b.Nombre like CONCAT(char(37), '" + frmNombre + "' ,Char(37)) "
         )
         AñoFiltro = "and YEAR(Fecha) like CONCAT(char(37), '" + frmAño + "' ,Char(37)) "
         MesFiltro = (
@@ -368,7 +369,7 @@ def receipts(request):
     if request.POST.get("frmEnvia", "") == "":
         txtInicial = "Selecciona un filtro para mostrar las facturas"
     else:
-        queryset = Comprobante.objects.raw("select 1 as id, upper(b.Nombre) Nombre, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, "
+        queryset = Comprobante.objects.raw("select 1 as id, e.Nombre NombreE, e.Rfc RFCE, upper(b.Nombre) NombreR, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, "
                                            "d.TasaOCuota*100 TasaOCuota, d.Importe, b.Rfc, a.TipoCambio, "
                                            "Moneda, a.UUIDInt, YEAR(Fecha) Periodo, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes "
                                            "from conciliacion_comprobante a "
@@ -378,13 +379,14 @@ def receipts(request):
                                            "on a.IDKey = c.IDKey "
                                            "left join conciliacion_traslado d "
                                            "on a.IDKey = d.IDKey "
-                                           "where a.TipoEmRe = 'Recibidas' "
+                                           "inner join conciliacion_emisor e on a.IDKey = e.IDKey "
+                                           "where a.TipoEmRe = 'Recibidas' "                                           
                                            + RFCFiltro
                                            + NombreFiltro
                                            + AñoFiltro
                                            + MesFiltro
                                            + " group by a.UUIDInt "
-                                           + "order by Fecha desc, Nombre Limit 10"
+                                           + "order by Fecha desc, b.Nombre"
                                            )
         #print(queryset)
         
@@ -401,7 +403,7 @@ def receipts(request):
             items = paginator.page(paginator.num_pages)
 
     rfc = Emisor.objects.raw(
-        "select distinct 1 as id, Rfc from conciliacion_receptor order by 2"
+        "select distinct 1 as id, Rfc from conciliacion_rfcclientes order by 2"
     )
     print(rfc)
     anio = Comprobante.objects.raw(
