@@ -13,6 +13,9 @@ from .models import *
 from .forms import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
+from conciliacion.serializers import BalanceSerializer
+from rest_framework import viewsets
+
 
 import pandas as pd
 from sqlalchemy import create_engine
@@ -31,6 +34,11 @@ env = environ.Env(
 # reading .env file
 environ.Env.read_env()
 
+
+class BalanceViewSet(viewsets.ModelViewSet):
+    queryset = Balance.objects.all()
+    serializer_class = BalanceSerializer
+
 def login(request):
     form = AuthenticationForm()
     if request.method == "POST":
@@ -45,7 +53,6 @@ def login(request):
                 do_login(request, user)
                 return redirect("/menu")
     return render(request, "login.html")
-
 
 def logout(request):
     do_logout(request)
@@ -99,7 +106,7 @@ def invoice(request):
         txtInicial = "Selecciona un filtro para mostrar las facturas"
     else:
         queryset = Comprobante.objects.raw("select 1 as id, e.Nombre NombreE, e.Rfc RFCE, upper(b.Nombre) NombreR, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, "
-                                           "d.TasaOCuota*100 TasaOCuota, d.Importe, b.Rfc, a.TipoCambio, "
+                                           "case when d.TasaOCuota is not null then d.TasaOCuota*100 else '' end  TasaOCuota, case when d.Importe is not null then d.Importe else '' end Importe, b.Rfc, a.TipoCambio, "
                                            "Moneda, a.UUIDInt, YEAR(Fecha) Periodo, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes "
                                            "from conciliacion_comprobante a "
                                            "inner join conciliacion_receptor b "
@@ -159,7 +166,6 @@ def invoice(request):
 
     return render(request, "importar.html", context)
 
-
 def invoiceDetail(request, UUID):
 
     titulo = "Detalle de facturas"
@@ -184,11 +190,12 @@ def detailFact(request, UUIDInt):
     form = addDatos(request.POST or None)
 
     if request.method == "POST":
-
-        if form.is_valid():
+        if form.is_valid():            
             print("Si entra")
             frm = form.save(commit=False)
             frm.save()
+        else:            
+            print("No se grabo nada :(")
     
     context = {
         "Titulo": "Agregar datos adicionales ",
@@ -315,7 +322,6 @@ def calcIMSS(request):
 
     return render(request, "calcIMSS.html", context)
 
-
 def parcialidades(request):
 
     qry = Comprobante.objects.raw(
@@ -369,8 +375,8 @@ def receipts(request):
     if request.POST.get("frmEnvia", "") == "":
         txtInicial = "Selecciona un filtro para mostrar las facturas"
     else:
-        queryset = Comprobante.objects.raw("select 1 as id, e.Nombre NombreE, e.Rfc RFCE, upper(b.Nombre) NombreR, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, "
-                                           "d.TasaOCuota*100 TasaOCuota, d.Importe, b.Rfc, a.TipoCambio, "
+        queryset = Comprobante.objects.raw("select 1 as id, e.Nombre NombreE, e.Rfc RFCE, upper(b.Nombre) NombreR, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, "                                           
+                                           "case when d.TasaOCuota is not null then d.TasaOCuota*100 else '' end  TasaOCuota, case when d.Importe is not null then d.Importe else '' end Importe, b.Rfc, a.TipoCambio, "
                                            "Moneda, a.UUIDInt, YEAR(Fecha) Periodo, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes "
                                            "from conciliacion_comprobante a "
                                            "inner join conciliacion_receptor b "
@@ -388,19 +394,19 @@ def receipts(request):
                                            + " group by a.UUIDInt "
                                            + "order by Fecha desc, b.Nombre"
                                            )
-        #print(queryset)
+        print(queryset)
         
-        paginator = Paginator(queryset, 15)
-        page = request.GET.get("page")
+        #paginator = Paginator(queryset, 15)
+        #page = request.GET.get("page")
         
-        try:
-            items = paginator.page(page)
-        except PageNotAnInteger:
+        #try:
+        #    items = paginator.page(page)
+        #except PageNotAnInteger:
             # If page is not an integer, deliver first page.
-            items = paginator.page(1)
-        except EmptyPage:
+        #    items = paginator.page(1)
+        #except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
-            items = paginator.page(paginator.num_pages)
+        #    items = paginator.page(paginator.num_pages)
 
     rfc = Emisor.objects.raw(
         "select distinct 1 as id, Rfc from conciliacion_rfcclientes order by 2"
@@ -494,7 +500,6 @@ def repRecibidas(request):
 
     return render(request, "factRecibidas.html", context)
 
-@login_required(login_url='/')
 def importBalanza(mes, new_conciliacion, txt):
 
     fname = new_conciliacion
@@ -630,7 +635,7 @@ def conciliacion(request):
         try:
 
             r105 = InvoiceEmitidas.objects.raw(
-                """select id, Cuenta, Mes, Año, Sum("""
+                """select 1 as id, Cuenta, Mes, Año, Sum("""
                 + campo_1
                 + """) campo_1, """
                 + campo_2
@@ -638,30 +643,22 @@ def conciliacion(request):
                 + campo_1
                 + """) - """
                 + campo_2
-                + """) Diff, TipoEmRe from (select a.id, b.Cuenta, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes, 
-                YEAR(a.Fecha) Año, a."""
-                + campo_1
-                + """, b."""
-                + campo_2
-                + """, b.Rfc, a.TipoEmRe from """
+                + """) Diff, TipoEmRe from """
                 + tabla
-                + """ a inner join conciliacion_balance b
-                    on YEAR(a.Fecha) and b.Año 
-                    and MONTH(a.Fecha) = b.Mes
-                    inner join conciliacion_emisor c
-                    on a.IDKey = c.IDKey 
-                    and c.Rfc = b.Rfc
-                    and b.Rfc = '"""
+                + """ a
+                    inner join conciliacion_emisor b
+                    on a.IDKey = b.IDKey 
+                    inner join conciliacion_balance c 
+                    on b.Rfc = c.RFC 
+                    and year(a.Fecha) = c.Año
+                    and month(a.Fecha) = c.Mes 
+                    where b.Rfc = '"""
                 + RFC
-                + """'                                    
-                                        where Cuenta like CONCAT('"""
+                + """'and Cuenta like CONCAT('"""
                 + cuenta
-                + """', char(37))
-                                        ) tbl
-                                        group by Mes, Año, """
-                + campo_2
-                + ", Cuenta, Rfc, TipoEmRe"
-            )
+                + """', char(37)) """
+                + """ group by c.Mes, c.Año, c.Cuenta, c.Cargos """)
+
             print(r105)
 
         except Exception():
@@ -692,8 +689,8 @@ def impbalanza(request):
     recibidas = InvoiceRecibidas.objects.raw(
         "select DISTINCT 1 id, timestamp, RFC_Receptor, replace(replace(replace(cast(timestamp as char), ' ', ''),'-',''),':', '') fecha, count(1) Total from conciliacion_invoicerecibidas group by timestamp, RFC_Receptor"
     )
-    print(emitidas)
-    print(recibidas)
+    #print(emitidas)
+    print(balanzas.query)
 
     context = {
         "titulo": titulo,
@@ -703,7 +700,6 @@ def impbalanza(request):
     }
 
     return render(request, "balanzasCargadas.html", context)
-
 
 def delete_balanza(request, balanza_id):
 
@@ -731,7 +727,6 @@ def delete_balanza(request, balanza_id):
 
     return redirect("impbalanza")
 
-
 def delete_factemitidas(request, factemitidas_id):
 
     factura = str(factemitidas_id)
@@ -755,7 +750,6 @@ def delete_factemitidas(request, factemitidas_id):
 
     return redirect("impbalanza")
 
-
 def delete_factrecibidas(request, factrecibidas_id):
 
     factura = str(factrecibidas_id)
@@ -777,7 +771,6 @@ def delete_factrecibidas(request, factrecibidas_id):
         print("Eliminación de facturas emitidas con fecha: " + factura)
 
     return redirect("impbalanza")
-
 
 def pagoprov(request):
 
@@ -850,7 +843,6 @@ def pagoprov(request):
 
     return render(request, "pagoProv.html", context)
 
-
 class BasicListView(View):
     model = None
 
@@ -873,11 +865,9 @@ class BasicListView(View):
 
         return render(request, "pagoProv.html", context)
 
-
 # View to display a list of countries
 class ISR_Em(BasicListView):
     model = Balance
-
 
 def export_data(request):
     response = HttpResponse(content_type="application/vnd.ms-excel")
@@ -901,7 +891,6 @@ def export_data(request):
     wb.save(response)
 
     return response
-
 
 def import_data(request):
     if request.method == "POST":

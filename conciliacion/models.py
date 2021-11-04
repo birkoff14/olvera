@@ -190,7 +190,8 @@ class Balance(models.Model):
     RFC = models.CharField(max_length=150, blank=False)
     timestamp =models.DateTimeField(auto_now=False, auto_now_add=True, verbose_name="Fecha")
     last_modified = models.DateTimeField(auto_now=False, auto_now_add=True, verbose_name="Ultima Actualización")
-
+    def __str__(self):
+        return self.Cuenta
 
 ################## Nuevas clases
 
@@ -336,6 +337,8 @@ class DatosFactura(models.Model):
     FechaPago = models.CharField(max_length=50, blank=False)
     FormaPago = models.ForeignKey(FormaPago, on_delete=models.CASCADE, null=True, verbose_name="Forma de pago")
     Notas = models.CharField(max_length=5000, blank=False)
+    CuentaContable = models.CharField(max_length=50, blank=False)
+    #CuentaContable = models.ForeignKey(Balance, on_delete=models.CASCADE, null=True, verbose_name="Cuenta Contable")
     idUsuario = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

@@ -87,7 +87,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for dt in items %}
+                    {% for dt in qry %}
                     <tr align="center">
                         <td>{{ forloop.counter }}</td>                        
                         <td align="left"><small>{{ dt.NombreR }} </small></td>
@@ -109,7 +109,7 @@
                                 <span class="fa fa-plus-circle"></span> Relacionadas
                             </a>
                             </small></td>
-                        <td><small>{{ dt.TasaOCuota }}% - ${{ dt.Importe }} </small></td>
+                        <td><small>{{ dt.TasaOCuota }} - {{ dt.Importe }} </small></td>
                         <td>
                             <a class="btn btn-primary btn-sm"
                                 href="#" onclick="return abrir_modal('{% url 'detailFact' dt.UUIDInt %}');">

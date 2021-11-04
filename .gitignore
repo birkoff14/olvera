@@ -5,10 +5,12 @@ nginx_waitress/*
 *.xls*
 conciliacion/migrations/*
 *.sql
-mysite/.env
 conciliacion/xml/*
 *.pyc
 log/
 __pycache__/*
 conciliacion/.env
 mysite/.env
+static/
+migrations/
+.env

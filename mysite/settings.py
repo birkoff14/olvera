@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'import_export',
     'pandas',
     'bootstrap_modal_forms',
+    'rest_framework',
+    'mathfilters',
     #'django_static_fontawesome',
     'conciliacion',
 ]

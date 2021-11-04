@@ -1,9 +1,15 @@
-from django.urls import path
+from django.urls import include, path
 from django.contrib import admin
 
 from conciliacion import views
 from .views import BasicListView
 from .models import Balance
+
+from rest_framework import routers
+from conciliacion import views
+
+router = routers.DefaultRouter()
+router.register(r'cuentasContables', views.BalanceViewSet)
 
 urlpatterns = [
     path("", views.login, name="login"),
@@ -30,6 +36,8 @@ urlpatterns = [
     path("parcialidades", views.parcialidades, name="parcialidades"),
     path("calcNomina", views.calcNomina, name="calcNomina"),
     path("calcIMSS", views.calcIMSS, name="calcIMSS"),
+    path('', include(router.urls)),
+
 ]
 
 
