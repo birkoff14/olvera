@@ -15,7 +15,11 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
 from conciliacion.serializers import BalanceSerializer
 from rest_framework import viewsets
+from django.template.loader import render_to_string
 
+from weasyprint import HTML
+#from weasyprint.fonts import FontConfiguration --version 52
+from weasyprint.text.fonts import FontConfiguration
 
 import pandas as pd
 from sqlalchemy import create_engine
@@ -23,6 +27,8 @@ from sqlalchemy.types import String
 from openpyxl import Workbook
 
 import environ, sys
+
+from django.db import connection
 
 
 # Create your views here.
@@ -916,3 +922,85 @@ def import_data(request):
             employee_resource.import_data(dataset, dry_run=False)
 
     return render(request, "import.html")
+
+
+def qryReporte(request, RFC, Nombre):
+
+    _rfc = RFC
+    _nombre = Nombre
+
+    qry = """select tbl.* from (
+        select 1 as id, '1' Tipo, Activo, Version, Serie, Folio, date_format(Fecha, CONCAT(char(37), 'm', '-', char(37), 'd', '-', char(37), 'Y')) Fecha, FormaPago, Total, a.UUIDInt UUID, '' UUIDHijo, TipoCambio, '0' NumParcialidad, 
+        '' ImpSaldoAnt, '' ImpPagado, '' ImpSaldoInsoluto, b.Rfc, b.Nombre, TipoEmRe, a.idKey
+        from conciliacion_comprobante a
+        inner join conciliacion_emisor b
+        on a.IDKey = b.IDKey
+        where TipoCambio = 'PPD'
+        union all
+        select 1 as id, '2' Tipo, '' Activo, '' Version, a.Serie, a.Folio, date_format(Fecha, CONCAT(char(37), 'm', '-', char(37), 'd', '-', char(37), 'Y')) Fecha, '' FormaPago, '' Total, IdDocumento UUID, a.UUIDInt UUIDHijo, MetodoDePagoDr TipoCambio, NumParcialidad, 
+        ImpSaldoAnt, ImpPagado, ImpSaldoInsoluto, b.Rfc, b.Nombre, '' TipoEmRe, a.IDKey
+        from conciliacion_doctorelacionado a
+        inner join conciliacion_emisor b
+        on a.IDKey = b.IDKey
+        inner join conciliacion_comprobante c
+        on a.IDKey = c.IDKey
+        ) tbl        
+        where tbl.Rfc  like CONCAT(char(37), '""" + _rfc + """' ,Char(37)) 
+        and tbl.Nombre like CONCAT(char(37), '""" + _nombre + """' ,Char(37)) 
+        order by tbl.uuid, cast(tbl.NumParcialidad as int)"""
+
+    return qry
+
+@login_required(login_url='/')
+def reportePPD(request):
+
+    RFC = request.GET.get("RFC", "")
+    Nombre = request.GET.get("Nombre", "")
+    qry = ""
+
+    print(RFC)
+
+    qry = Comprobante.objects.raw(qryReporte(request, RFC, Nombre))    
+    
+    #cursor = connection.cursor()
+    #qry = cursor.execute("call reportePPD('0002E59D-5588-4681-9D96-0026A39A2538')")
+    #cursor.fetchall()
+
+    #print(qry)
+
+    context = { "Titulo" : "Reporte de parcialidades", "qry" : qry}
+    html = render_to_string("reportePPD.html", context)
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = "inline; report.pdf"
+
+    font_config = FontConfiguration()
+    HTML(string=html).write_pdf(response, font_config=font_config)
+
+    return response
+
+@login_required(login_url='/')
+def factParciales(request):
+        
+    RFC = request.POST.get("RFC", "")
+    Nombre = request.POST.get("Nombre", "")
+    frmTrue = request.POST.get("frmEnvia", "")
+    qry = ""
+
+    print(RFC)
+
+    if frmTrue != "":
+        
+        qry = Comprobante.objects.raw(qryReporte(request, RFC, Nombre))  
+        
+        print(qry)
+
+    context = {
+        "Titulo" : "Reporte de parcialidades", 
+        "RFC" : RFC,
+        "Nombre" : Nombre,
+        "qry" : qry,
+        "frmTrue" : frmTrue,
+    }
+
+    return render(request, "factParciales.html", context)

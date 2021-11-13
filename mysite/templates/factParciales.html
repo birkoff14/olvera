@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content %}
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">{{ Titulo }} </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+      <div class="btn-group me-2">
+        <a href="{% url 'reportePPD' %}?RFC={{ RFC }}&Nombre={{ Nombre }}" target="_blank" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">PDF</a>
+        <a href="#" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">XLS</a>
+      </div>
+    </div>
+  </div>
+
+  <form class="form-inline mt-2 mt-md-0 needs-validation" novalidate action="{% url 'factParciales' %}" name="form1"
+    method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+      <div class="row">
+        <div class="col">
+          RFC: <input type="text" id="RFC" name="RFC" class="form-control" placeholder="RFC" aria-label="RFC">
+        </div>
+        <div class="col">
+          Nombre <input type="text" id="Nombre" name="Nombre" class="form-control" placeholder="Nombre Cliente"
+            aria-label="Nombre Cliente">
+          <input type="hidden" value="1" name="frmEnvia">
+        </div>
+      </div>
+      <br>
+      <div class="col">        
+        <button type="submit" class="btn btn-secondary">Obtener conciliacion</button>
+      </div>
+    </div>
+  </form>
+  <hr>
+  {% if frmTrue %}
+  <div class="row ">
+    <h3>Reporte generado</h3>
+  </div>
+  <div class="row">
+    RFC: {{ RFC }} | Nombre: {{ Nombre }}
+  </div>
+  <br />
+  <div class="row">
+    <div class="col">
+      <table class="table" id="tblInicial" style="font-size: smaller;">
+        <thead class="thead-light">
+          <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">RFC</th>
+            <th scope="col">Factura</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Total</th>
+            <th scope="col">No. Parcialidad</th>
+            <th scope="col">Imp. Saldo Anterior</th>
+            <th scope="col">Imp. Pagado</th>
+            <th scope="col">Saldo Insoluto</th>
+            <th scope="col">UUID</th>
+            <th scope="col">UUID Parcial</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for dt in qry %}
+          <tr>
+            <!--<th scope="row">1</th>-->
+            <td>{{ dt.Nombre }}</td>
+            <td>{{ dt.Rfc }}</td>
+            <td>{{ dt.Serie }} - {{ dt.Folio }}</td>
+            <td>{{ dt.Fecha }}</td>
+            <td>{{ dt.Total }}</td>
+            <td>{{ dt.NumParcialidad }}</td>
+            <td>{{ dt.ImpSaldoAnt }}</td>
+            <td>{{ dt.ImpPagado }}</td>
+            <td>{{ dt.ImpSaldoInsoluto }}</td>
+            <td>{{ dt.UUID }} </td>
+            <td>{{ dt.UUIDHijo }} </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</main>
+{% endblock %}

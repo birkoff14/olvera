@@ -36,8 +36,9 @@ urlpatterns = [
     path("parcialidades", views.parcialidades, name="parcialidades"),
     path("calcNomina", views.calcNomina, name="calcNomina"),
     path("calcIMSS", views.calcIMSS, name="calcIMSS"),
+    path("reportePPD", views.reportePPD, name="reportePPD"),
+    path("factParciales", views.factParciales, name="factParciales"),
     path('', include(router.urls)),
-
 ]
 
 

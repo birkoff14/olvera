@@ -132,13 +132,7 @@
                 </li>
               </ul>     
             </li>
-          -->
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'conciliacion' %}?RFC=AMI830615IA0&cuenta=105-00&campo_1=Total&campo_2=Cargos&tabla=conciliacion_comprobante&title_1=XML+Emitidos+Total&title_2=Total+de+Cargos+de+Clientes">
-                <span data-feather="layers"></span>
-                Conciliación
-              </a>
-            </li>
+          -->            
           </ul>
 
           <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
@@ -196,6 +190,26 @@
                   IMSS 
                 </a>
               </li> 
+              </ul>
+              <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Reportes</span>
+                <a class="link-secondary" href="#" aria-label="Add a new report">
+                  <!--<span data-feather="plus-circle"></span>-->
+                </a>
+              </h6>
+              <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'conciliacion' %}?RFC=AMI830615IA0&cuenta=105-00&campo_1=Total&campo_2=Cargos&tabla=conciliacion_comprobante&title_1=XML+Emitidos+Total&title_2=Total+de+Cargos+de+Clientes">
+                    <span data-feather="layers"></span>
+                    Conciliación
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'factParciales' %}">
+                    <span data-feather="layers"></span>
+                    Facturas por parcialidad
+                  </a>
+                </li>
               </ul>
          <!-- <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
             <span>Administración de usuarios</span>

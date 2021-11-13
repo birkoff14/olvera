@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'bootstrap_modal_forms',
     'rest_framework',
     'mathfilters',
+    #'weasyprint',
     #'django_static_fontawesome',
     'conciliacion',
 ]
