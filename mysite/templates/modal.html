@@ -1,0 +1,73 @@
+<!-- Vertically centered modal -->
+{% load crispy_forms_tags %}
+{% load static %}
+
+<div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalCenterTitle">{{ Titulo }}</h5>
+            <button type="button" onclick="return cerrar_modal()" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            Factura {{ UUID }}
+            <hr />
+            <form name="form1" action="{% url 'detailFact' UUID %}" method="POST">
+                <fieldset>
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <input type="submit" name="submit" class='btn btn-primary' id="submit_btn" value="Agregar datos" />
+                </fieldset>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" onclick="return cerrar_modal()" class="btn btn-secondary"
+                data-dismiss="modal">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+{% block js %}
+
+<script>
+
+    document.getElementById("id_UUIDInt").value = '{{ UUID }}'
+    document.getElementById("id_UUIDInt").readOnly = true;
+
+    function enviar_formulario() {
+        document.form1.submit();
+    }
+
+
+    $("form").on("submit", function (e) {
+
+        var dataString = $(this).serialize();
+
+        //alert(dataString); return false;
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'detailFact' UUID %}",
+            data: dataString,
+            success: function () {
+                $("#invoice").html("<div id='message'></div>");
+                $("#message")
+                    .html("<h3>Se agregaron los datos a la factura</h3>")
+                    .append('{{ UUID }}')
+                    .hide()
+                    .fadeIn(1500, function () {
+                        $("#message").append(
+                            "<img id='checkmark' height='50' width='50' src='{% static 'img/check.png' %}' />"
+                        );
+                        $('#message').delay(3000).fadeOut(300);
+                    });
+            }
+        });
+        $('#ventana_modal').modal('hide');
+
+        e.preventDefault();
+    });
+
+</script>
+{% endblock %}

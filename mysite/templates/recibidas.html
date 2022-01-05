@@ -1,38 +1,204 @@
 {% extends "base.html" %}
-
+{% load humanize %}
 {% block content %}
+
+{% load navigation_filters %}
+{% load my_tags %}
+
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-      <h1 class="h2">{{ titulo }} </h1>      
-    </div>    
-
-    <div class="text-center text-success align-middle">
-        <h2>{{ file }}</h2>
-        {{ error }}
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ titulo }} </h1>
     </div>
-
-    {% if not hideForm == 1 %}
-
-    <div class="bg-light p-5 rounded">        
-        <p class="lead">Seleciona el archivo Excel CFDI que deseas subir</p>
-        
-        <form class="form-inline mt-2 mt-md-0 needs-validation" novalidate method="POST" enctype="multipart/form-data">  
-            {% csrf_token %}  
+    <div class="bg-light p-5 rounded">
+        <form class="form-inline mt-2 mt-md-0 needs-validation" novalidate action="{% url 'receipts' %}" name="form1"
+            method="POST">
+            {% csrf_token %}
             <div class="form-group">
-                <div class="input-group mb-3">
-                    <input type="file" class="form-control" id="inputGroupFile02" name="xlsfile" required>
-                    <button type="submit" class="input-group-text">Subir</button>
-                    <!-- <label class="input-group-text" for="inputGroupFile02">Upload</label> -->
-                    <div class="invalid-feedback">
-                        Selecciona el archivo de CFDI.
-                      </div>
-                </div>  
-            </div>                       
-        </form>  
+                <div class="container">
+                    <div class="row align-items-start">
+                        <div class="col">
+                            Nombre: <input type="text" class="form-control" name="Cliente">
+                            <input type="hidden" name="frmEnvia" value="1">
+                        </div>
+                        <div class="col">
+                            RFC: <select class="form-select" name="RFC">
+                                <option value="">Seleccione el RFC</option>
+                                {% for dt in rfc %}
+                                <option value="{{ dt.Rfc }}">{{ dt.Rfc }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                El RFC es obligatorio.
+                            </div>
+                        </div>
+                        <div class="col">
+                            Año: <select class="form-select" name="Anio">
+                                <option value="">Seleccione el año</option>
+                                {% for dt in anio %}
+                                <option value="{{ dt.Año }}">{{ dt.Año }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                El Año es obligatorio.
+                            </div>
+                        </div>
+                        <div class="col">
+                            Mes: <select class="form-select" name="Mes">
+                                <option value="">Seleccione el mes</option>
+                                {% for dt in mes %}
+                                <option value="{{ dt.Mes }}">{{ dt.Mes }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                El Mes es obligatorio.
+                            </div>
+                        </div>
+                        <div class="col">
+                        </div>
+                    </div>
+                </div>
+                <br /><br />
+                <button type="submit" class="btn btn-secondary">Aplicar filtro</button>
+        </form>
+        <hr />
+        <div id="invoice"></div>
+        {% if frmTrue %}
+        <br />
+        <h5>Filtros aplicados:</h5> <br />
+        {{ NombreFiltro }} | {{ RFCFiltro }} | {{ AñoFiltro }} | {{ MesFiltro }}
+        <br /><br />        
+        <div class="table-responsive">
+            <table class="table table-striped table-sm" id="tblInicial">
+                <thead>
+                    <tr align="center">
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>RFC</th>
+                        <th>Mes - Año</th>
+                        <th>SubTotal</th>
+                        <th>IVA</th>
+                        <th>Total</th>
+                        <th>Moneda</th>
+                        <th>Concepto</th>
+                        <th>Fact Rel</th>
+                        <th>Tasa</th>
+                        <th>Detalle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dt in qry %}
+                    <tr align="center">
+                        <td>{{ forloop.counter }}</td>
+                        <td align="left"><small>{{ dt.NombreE }} </small></td>
+                        <td><small>{{ dt.RFCE }}</small></td>
+                        <td><small>{{ dt.Mes }} - {{ dt.Periodo }}</small></td>
+                        <td><small>${{ dt.SubTotal|floatformat:"2"|intcomma }}</small></td>
+                        <td><small>${{ dt.IVA|floatformat:"2"|intcomma }}</small></td>
+                        <td><small>${{ dt.Total|floatformat:"2"|intcomma }}</small></td>
+                        <td><small>{{ dt.Moneda }} {{dt.TipoCambio}} </small></td>
+                        <td><small>
+                                <button type="button" class="btn btn-primary btn-sm" data-toggle="tooltip"
+                                    data-placement="top" title="{{ dt.Descripcion }} " readonly>
+                                    Ver concepto
+                                </button>
+                            </small></td>
+                            <td><small>
+                                <a class="btn btn-primary btn-sm"
+                                href="#" onclick="return abrir_modal('{% url 'invoiceDetail' dt.UUIDInt %}');">
+                                <span class="fa fa-plus-circle"></span> Ver relacionadas
+                            </a>
+                            </small></td>
+                        <td><small>{{ dt.TasaOCuota }} - {{ dt.Importe }} </small></td>
+                        <td>
+                            <a class="btn btn-primary btn-sm"
+                                href="#" onclick="return abrir_modal('{% url 'detailFact' dt.UUIDInt %}');">
+                                <span class="fa fa-plus-circle"></span> Ver
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="row" >            
+            {{ txt }}
+        </div>
+        {% endif %}
     </div>
+
+    <!--
+    <ul>
+        {% for item in items %}
+        <li>{{ item.Nombre }}</li>
+        {% endfor %}
+    </ul>
+
+    {% if items.has_next or items.has_previous %}
+
+    <ul class="pagination">
+        {% if items.has_previous %}
+        <li class="page-item"><a href="?page={{ param_replace }} {{ items.previous_page_number }}" class="page-link">
+                <span aria-hidden="true">&laquo;</span>
+            </a></li>
+        {% endif %}
+
+        {% for page in items.paginator.page_range|page_filter:items %}
+        <li class="{% if items.number == page %}page-item active{% endif %}">
+            <a class="page-link" href="?page={{ param_replace }}{{ page }}">{{ page }}</a>
+        </li>
+        {% endfor %}
+
+        {% if items.has_next %}
+        <li class="page-item">
+            <a href="?page={{ items.next_page_number }}" class="page-link">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
 
     {% endif %}
+-->
+</main>
 
-    </main>
-    
+<div class="modal fade" id="ventana_modal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+
+<script>
+    function abrir_modal(url) {
+        $('#ventana_modal').load(url, function () {
+            $(this).modal({
+                backdrop: 'static',
+                keyboard: false
+            })
+
+            $(this).modal('show');
+        });
+
+        return false;
+
+    }
+
+    function cerrar_modal() {
+
+        $('#ventana_modal').modal('hide');
+
+        return false;
+    }
+
+</script>
+
 {% endblock %}

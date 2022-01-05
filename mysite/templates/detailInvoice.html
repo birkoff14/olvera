@@ -1,0 +1,48 @@
+<div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalCenterTitle">{{ rel }}</h5>
+            <button type="button" onclick="return cerrar_modal()" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            Factura {{ ID }}
+    <div class="bg-light p-5 rounded">
+
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr align="center">
+                        <th scope="col">Folio</th>
+                        <th scope="col">Moneda</th>
+                        <th scope="col">Metodo de pago</th>
+                        <th scope="col">No Parcialidad</th>
+                        <th scope="col">Saldo anterior</th>
+                        <th scope="col">Imp Pagado</th>
+                        <th scope="col">Saldo Insoluto</th>                        
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dt in query %}
+                    <tr align="center">
+                        <th scope="row">{{ dt.Folio}} - {{ dt.Serie }}</th>
+                        <td>{{ dt.MonedaDR }} </td>
+                        <td>{{ dt.MetodoDePagoDR }}</td>
+                        <td>{{ dt.NumParcialidad }}</td>
+                        <td>{{ dt.ImpSaldoAnt }}</td>
+                        <td>{{ dt.ImpPagado }}</td>
+                        <td>{{ dt.ImpSaldoInsoluto }}</td>                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" onclick="return cerrar_modal()" class="btn btn-secondary"
+        data-dismiss="modal">Cerrar</button>
+</div>
+</div>
+</div>

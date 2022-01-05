@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{% load humanize %}
 
 {% block content %}
 
@@ -46,9 +47,9 @@
           </thead>
           <tbody>            
             <tr>
-              <td>SERVICIOS PROFESIONALES16% IVA</td>
+              <td>Serv. Prof. 16%</td>
               {% for dt in qryISR %}
-              <td>{{ dt.SP_16 }}</td>
+              <td>{{ dt.Sub16|floatformat:"0"|intcomma }}</td>
               {% endfor %}
               <td>aqui total</td>
             </tr>            

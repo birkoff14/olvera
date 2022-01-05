@@ -1,8 +1,16 @@
 env/
-__pycache__/*
+conciliacion/__pycache__/*
 db.sqlite3
 nginx_waitress/*
 *.xls*
 conciliacion/migrations/*
 *.sql
+conciliacion/xml/*
+*.pyc
+log/
+__pycache__/*
+conciliacion/.env
 mysite/.env
+static/
+migrations/
+.env
