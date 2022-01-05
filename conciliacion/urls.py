@@ -37,9 +37,12 @@ urlpatterns = [
     path("calcNomina", views.calcNomina, name="calcNomina"),
     path("calcIMSS", views.calcIMSS, name="calcIMSS"),
     path("reportePPD", views.reportePPD, name="reportePPD"),
+    path("reporteRecibidas", views.reporteRecibidas, name="reporteRecibidas"),
     path("factParciales", views.factParciales, name="factParciales"),
+    path("factParcialesRecibidas", views.reporteRecibidas, name="factParcialesRecibidas"),
+    path("testPDF", views.testPDF, name="testPDF"),
+
     path('', include(router.urls)),
 ]
-
 
 admin.site.site_header = 'Olvera Contadores'

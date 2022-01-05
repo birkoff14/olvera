@@ -330,8 +330,8 @@ class FormaPago(models.Model):
 
 class DatosFactura(models.Model):
     idDato = models.AutoField(primary_key=True, verbose_name="ID")
-    ProyectoCont = models.ForeignKey(InProyecto, on_delete=models.CASCADE, null=True, verbose_name="Proyecto Contabilidad")
-    #InContabilidad= models.ForeignKey(InContabilidad, on_delete=models.CASCADE, null=True, verbose_name="Ingreso contabilidad")
+    ProyectoCont = models.ForeignKey(InProyecto, on_delete=models.CASCADE, null=True, verbose_name="Proyectos")    
+    Contabilidad = models.ForeignKey(InContabilidad, on_delete=models.CASCADE, null=True, verbose_name="Contabilidad")
     #GaProyecto = models.ForeignKey(GaProyecto, on_delete=models.CASCADE, null=True, verbose_name="Gasto proyecto")
     #GaContabilidad = models.ForeignKey(GaContabilidad, on_delete=models.CASCADE, null=True, verbose_name="Gasto contabilidad")
     FechaPago = models.CharField(max_length=50, blank=False)

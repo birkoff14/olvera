@@ -1,6 +1,6 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
-from .models import Balance, DatosFactura, InProyecto, FormaPago, TablaQuincenal, TablaMensual, TablaSubsidioQ, TablaSubsidioM, Comprobante, FactorIntegracion, DatosPatronIMSS, DatosObrero
+from .models import Balance, DatosFactura, InProyecto, InContabilidad, FormaPago, TablaQuincenal, TablaMensual, TablaSubsidioQ, TablaSubsidioM, Comprobante, FactorIntegracion, DatosPatronIMSS, DatosObrero
 
 # Register your models here.
 
@@ -21,7 +21,7 @@ class BalanceAdmin(admin.ModelAdmin):
 
 @admin.register(DatosFactura)
 class DatosFacturaAdmin(admin.ModelAdmin):
-    list_display = ("ProyectoCont", "FechaPago", "FormaPago", "Notas", "idUsuario", "UUIDInt")
+    list_display = ("ProyectoCont", "Contabilidad", "FechaPago", "FormaPago", "Notas", "idUsuario", "UUIDInt")
     
 @admin.register(Comprobante)
 class ComprobanteAdmin(admin.ModelAdmin):
@@ -29,6 +29,10 @@ class ComprobanteAdmin(admin.ModelAdmin):
 
 @admin.register(InProyecto)
 class InProyectoAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(InContabilidad)
+class InContabilidadAdmin(admin.ModelAdmin):
     pass
 
 @admin.register(FormaPago)

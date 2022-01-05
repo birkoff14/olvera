@@ -783,67 +783,24 @@ def pagoprov(request):
     # form = RFC(request.POST or None)
 
     RFC = request.POST.get("RFC_Emisor", "")
-    # RFC_comp = "'" + RFC + "'"
 
-    dsISR_SP = InvoiceEmitidas.objects.raw(
-        """select 1 as id, SUBSTR(Fecha_Emision, 4, 2) Mes, 
-                              RFC_Emisor, round(sum(IVA_16)) IVA_16, round(sum(IVA_16)/0.16) SP_16, round(Sum(Total)) Total
-                              from conciliacion_invoiceemitidas 
-                              where SUBSTR(Fecha_Emision, 7, 4) = 2020                               
-                              and RFC_Emisor =  '"""
-        + RFC
-        + """'
-                              and PROYECTO = 'Supervisión de Proyectos'
-                              and Tipo = 'Factura'                              
-                              group by RFC_Emisor, SUBSTR(Fecha_Emision, 4, 2)
-                              order by RFC_Emisor ASC"""
-    )
-
-    dsISR_TR = InvoiceEmitidas.objects.raw(
-        """select 1 as id, SUBSTR(Fecha_Emision, 4, 2) Mes, 
-                              RFC_Emisor, round(sum(IVA_16)) IVA_16, round(sum(IVA_16)/0.16) TR_16, round(Sum(Total)) Total
-                              from conciliacion_invoiceemitidas 
-                              where SUBSTR(Fecha_Emision, 7, 4) = 2020                               
-                              and RFC_Emisor =  '"""
-        + RFC
-        + """'
-                              and PROYECTO = 'Transporte'
-                              and Tipo = 'Factura'                              
-                              group by RFC_Emisor, SUBSTR(Fecha_Emision, 4, 2)
-                              order by RFC_Emisor ASC"""
-    )
-
-    dsISR_IN = InvoiceEmitidas.objects.raw(
-        """select 1 as id, SUBSTR(Fecha_Emision, 4, 2) Mes, 
-                              RFC_Emisor, round(sum(IVA_16)) IVA_16, round(sum(IVA_16)/0.16) SP_16, round(Sum(Total)) Total
-                              from conciliacion_invoiceemitidas 
-                              where SUBSTR(Fecha_Emision, 7, 4) = 2020                               
-                              and RFC_Emisor =  '"""
-        + RFC
-        + """'
-                              and PROYECTO = 'Supervisión de Proyectos'
-                              and Tipo = 'Factura'                              
-                              group by RFC_Emisor, SUBSTR(Fecha_Emision, 4, 2)
-                              order by RFC_Emisor ASC"""
-    )
-
-    """
-    x = InvoiceEmitidas.objects.values('Fecha_Emision', 'RFC_Emisor'
-                               ).order_by('Fecha_Emision'
-                                          ).annotate(IVA_16=Sum('IVA_16'), SP_16=Sum('IVA_16')/0.16
-                                                     ).filter(RFC_Emisor=RFC_comp)                                  
-   
-    print(x.query)
+    qry = Comprobante.objects.raw("select 1 as id, year(Fecha), month(Fecha), Sum(c.TotalImpuestosTrasladados)/0.16 Sub16," 
+                                  "Sum(c.TotalImpuestosTrasladados) IVA, Sum(Total) Total from "
+                                  "conciliacion_comprobante a "
+                                  "inner join conciliacion_emisor b "
+                                  "on a.IDKey = b.IDKey "
+                                  "inner join conciliacion_impuestos c "
+                                  "on a.IDKey = c.IDKey "
+                                  "where year(Fecha) = 2021 "
+                                  "and b.Rfc = '" + RFC + 
+                                  "' group by year(Fecha), month(Fecha)"
+                                        )   
     
-    y = x.filter(Proyecto__startswith="Supervi")
+    print(qry.query)
     
-    print(y.query)
-    """
 
     context = {
-        "qryISR": dsISR_SP,
-        "qryISR_TR": dsISR_TR,
-        "qryISR_IN": dsISR_IN
+        "qryISR": qry,        
         # "frm" : form
     }
 
@@ -923,6 +880,36 @@ def import_data(request):
 
     return render(request, "import.html")
 
+def qryReporteRecibidas(request, RFC, Nombre):
+
+    _rfc = RFC
+    _nombre = Nombre
+
+    qry = """select tbl.* from (
+        select 1 as id, '1' Tipo, Activo, Version, Serie, Folio, date_format(Fecha, CONCAT(char(37), 'm', '-', char(37), 'd', '-', char(37), 'Y')) Fecha, FormaPago, Total, a.UUIDInt UUID, '' UUIDHijo, TipoCambio, '0' NumParcialidad, 
+        '' ImpSaldoAnt, '' ImpPagado, '' ImpSaldoInsoluto, b.Rfc, b.Nombre, c.Rfc RFCR, c.Nombre NombreR, TipoEmRe, a.idKey
+        from conciliacion_comprobante a
+        inner join conciliacion_emisor b
+        on a.IDKey = b.IDKey
+        inner join conciliacion_receptor c
+        on a.IDKey = c.IDKey
+        where TipoCambio = 'PPD'
+        union all
+        select 1 as id, '2' Tipo, '' Activo, '' Version, a.Serie, a.Folio, date_format(Fecha, CONCAT(char(37), 'm', '-', char(37), 'd', '-', char(37), 'Y')) Fecha, '' FormaPago, '' Total, IdDocumento UUID, a.UUIDInt UUIDHijo, MetodoDePagoDr TipoCambio, NumParcialidad, 
+        ImpSaldoAnt, ImpPagado, ImpSaldoInsoluto, b.Rfc, b.Nombre, d.Rfc RFCR, d.Nombre NombreR, '' TipoEmRe, a.IDKey
+        from conciliacion_doctorelacionado a
+        inner join conciliacion_emisor b
+        on a.IDKey = b.IDKey
+        inner join conciliacion_comprobante c
+        on a.IDKey = c.IDKey
+        inner join conciliacion_receptor d
+        on a.IDKey = d.IDKey
+        ) tbl        
+        where tbl.Rfc  like CONCAT(char(37), '""" + _rfc + """' ,Char(37)) 
+        and tbl.Nombre like CONCAT(char(37), '""" + _nombre + """' ,Char(37))
+        order by tbl.uuid, cast(tbl.NumParcialidad as int)"""
+
+    return qry
 
 def qryReporte(request, RFC, Nombre):
 
@@ -931,14 +918,16 @@ def qryReporte(request, RFC, Nombre):
 
     qry = """select tbl.* from (
         select 1 as id, '1' Tipo, Activo, Version, Serie, Folio, date_format(Fecha, CONCAT(char(37), 'm', '-', char(37), 'd', '-', char(37), 'Y')) Fecha, FormaPago, Total, a.UUIDInt UUID, '' UUIDHijo, TipoCambio, '0' NumParcialidad, 
-        '' ImpSaldoAnt, '' ImpPagado, '' ImpSaldoInsoluto, b.Rfc, b.Nombre, TipoEmRe, a.idKey
+        '' ImpSaldoAnt, '' ImpPagado, '' ImpSaldoInsoluto, b.Rfc, b.Nombre, c.Rfc RFCR, c.Nombre NombreR, TipoEmRe, a.idKey
         from conciliacion_comprobante a
         inner join conciliacion_emisor b
         on a.IDKey = b.IDKey
+        inner join conciliacion_receptor c
+        on a.IDKey = c.IDKey
         where TipoCambio = 'PPD'
         union all
         select 1 as id, '2' Tipo, '' Activo, '' Version, a.Serie, a.Folio, date_format(Fecha, CONCAT(char(37), 'm', '-', char(37), 'd', '-', char(37), 'Y')) Fecha, '' FormaPago, '' Total, IdDocumento UUID, a.UUIDInt UUIDHijo, MetodoDePagoDr TipoCambio, NumParcialidad, 
-        ImpSaldoAnt, ImpPagado, ImpSaldoInsoluto, b.Rfc, b.Nombre, '' TipoEmRe, a.IDKey
+        ImpSaldoAnt, ImpPagado, ImpSaldoInsoluto, b.Rfc, b.Nombre, '', '', '' TipoEmRe, a.IDKey
         from conciliacion_doctorelacionado a
         inner join conciliacion_emisor b
         on a.IDKey = b.IDKey
@@ -951,6 +940,10 @@ def qryReporte(request, RFC, Nombre):
 
     return qry
 
+def testPDF(request):
+    
+    return render(request, "reportePPD.html")
+
 @login_required(login_url='/')
 def reportePPD(request):
 
@@ -962,6 +955,7 @@ def reportePPD(request):
 
     qry = Comprobante.objects.raw(qryReporte(request, RFC, Nombre))    
     
+    print(qry)
     #cursor = connection.cursor()
     #qry = cursor.execute("call reportePPD('0002E59D-5588-4681-9D96-0026A39A2538')")
     #cursor.fetchall()
@@ -969,15 +963,17 @@ def reportePPD(request):
     #print(qry)
 
     context = { "Titulo" : "Reporte de parcialidades", "qry" : qry}
-    html = render_to_string("reportePPD.html", context)
+    #html = render_to_string("reportePPD.html", context)
 
-    response = HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"] = "inline; report.pdf"
+    #response = HttpResponse(content_type="application/pdf")
+    #response["Content-Disposition"] = "inline; report.pdf"
 
-    font_config = FontConfiguration()
-    HTML(string=html).write_pdf(response, font_config=font_config)
+    #font_config = FontConfiguration()
+    #HTML(string=html).write_pdf(response, font_config=font_config)
 
-    return response
+    #return response
+
+    return render(request, "reportePPD.html", context)
 
 @login_required(login_url='/')
 def factParciales(request):
@@ -996,7 +992,7 @@ def factParciales(request):
         print(qry)
 
     context = {
-        "Titulo" : "Reporte de parcialidades", 
+        "Titulo" : "Facturas PPD y complementos de pago", 
         "RFC" : RFC,
         "Nombre" : Nombre,
         "qry" : qry,
@@ -1004,3 +1000,25 @@ def factParciales(request):
     }
 
     return render(request, "factParciales.html", context)
+
+
+def reporteRecibidas(request):
+
+    RFC = request.POST.get("RFC", "")
+    Nombre = request.POST.get("Nombre", "")
+    frmTrue = request.POST.get("frmEnvia", "")
+    qry = ""
+
+    if frmTrue != "":
+        
+        qry = Comprobante.objects.raw(qryReporteRecibidas(request, RFC, Nombre))
+
+    context = {
+        "Titulo" : "Facturas Recibidas PPD y complementos de pago", 
+        "RFC" : RFC,
+        "Nombre" : Nombre,
+        "qry" : qry,
+        "frmTrue" : frmTrue,
+    }
+
+    return render(request, "factParcRecibidas.html", context)

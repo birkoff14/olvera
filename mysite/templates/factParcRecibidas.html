@@ -3,7 +3,7 @@
 
 {% block css %}
 <style>
-  .red {
+  .grayClass {
     background-color: gray !important;
   }
 </style>
@@ -15,14 +15,14 @@
     <h1 class="h2">{{ Titulo }} </h1>
     <div class="btn-toolbar mb-2 mb-md-0">
       <div class="btn-group me-2">
-        <a href="{% url 'reportePPD' %}?RFC={{ RFC }}&Nombre={{ Nombre }}" target="_blank"
+        <a href="{% url 'reporteRecibidas' %}?RFC={{ RFC }}&Nombre={{ Nombre }}" target="_blank"
           class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">PDF</a>
         <a href="#" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">XLS</a>
       </div>
     </div>
   </div>
 
-  <form class="form-inline mt-2 mt-md-0 needs-validation" novalidate action="{% url 'factParciales' %}" name="form1"
+  <form class="form-inline mt-2 mt-md-0 needs-validation" novalidate action="{% url 'factParcialesRecibidas' %}" name="form1"
     method="POST">
     {% csrf_token %}
     <div class="form-group">
@@ -74,11 +74,11 @@
         <tbody>
           {% for dt in qry %}
           <tr>
-            <!--<th scope="row">1</th>-->
-            <td>{{ dt.Nombre }}</td>            
-            <td>{{ dt.Rfc }}</td>
+            <!--<th scope="row">1</th>-->            
             <td>{{ dt.NombreR }}</td>
             <td>{{ dt.RFCR }}</td>
+            <td>{{ dt.Nombre }}</td>            
+            <td>{{ dt.Rfc }}</td>
             <td>{{ dt.Serie }} - {{ dt.Folio }}</td>
             <td>{{ dt.Fecha }}</td>
             <td>{{ dt.Total }}</td>
@@ -105,9 +105,9 @@
   $(document).ready(function () {
     $('#example').DataTable({
       "createdRow": function (row, data, dataIndex) {
-        if ( data[5] == '0') {
+        if ( data[7] == '0') {
           //alert('hola');
-          $(row).addClass('redClass');
+          $(row).addClass('grayClass');
         }
       }
     });

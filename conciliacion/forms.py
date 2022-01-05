@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import InvoiceEmitidas, DatosFactura, InProyecto, FormaPago, Balance
+from .models import InvoiceEmitidas, DatosFactura, InProyecto, FormaPago, Balance, InContabilidad
 from django.forms import ModelChoiceField
 import datetime
 from .services import cuentasContables
@@ -26,11 +26,11 @@ class UserModelChoiceField(ModelChoiceField):
 class addDatos(forms.ModelForm):
     class Meta:
         model = DatosFactura
-        fields = ["ProyectoCont", "FechaPago", "FormaPago", "Notas", "CuentaContable", "idUsuario", "UUIDInt"]
+        fields = ["ProyectoCont", "Contabilidad", "FechaPago", "FormaPago", "Notas", "CuentaContable", "idUsuario", "UUIDInt"]
         
     #InProyecto = forms.ModelChoiceField(label="Ingresos proyectos", queryset=InProyecto.objects.all().values_list('InProyecto').distinct())
     ProyectoCont = forms.ModelChoiceField(label="Proyectos contabilidad", queryset=InProyecto.objects.all().order_by('InProyecto'))
-    #InContabilidad = forms.ModelChoiceField(label="Ingresos Contabilidad", queryset=InContabilidad.objects.all())
+    Contabilidad = forms.ModelChoiceField(label="Ingresos Contabilidad", queryset=InContabilidad.objects.all())
     #GaProyecto = forms.ModelChoiceField(label="Gastos Proyecto", queryset=GaProyecto.objects.all())
     #GaContabilidad = forms.ModelChoiceField(label="Gastos Contabilidad", queryset=GaContabilidad.objects.all())
     #idUsuario = forms.ModelChoiceField(label="Usuario", queryset=User.objects.all())
