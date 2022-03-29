@@ -543,7 +543,16 @@ class Migration(migrations.Migration):
                 ('timestamp', models.DateTimeField(auto_now_add=True, verbose_name='Fecha')),
                 ('FormaPago', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='conciliacion.formapago', verbose_name='Forma de pago')),
                 ('ProyectoCont', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='conciliacion.inproyecto', verbose_name='Proyecto Contabilidad')),
+                ('InContabilidad', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='conciliacion.incontabilidad', verbose_name='Contabilidad')),
+                ('CuentaContable', models.CharField(max_length=50)),
                 ('idUsuario', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='RFCClientes',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('Rfc', models.CharField(max_length=20)),
             ],
         ),
     ]

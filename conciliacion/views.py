@@ -17,7 +17,7 @@ from conciliacion.serializers import BalanceSerializer
 from rest_framework import viewsets
 from django.template.loader import render_to_string
 
-from weasyprint import HTML
+from weasyprint import HTML, CSS
 #from weasyprint.fonts import FontConfiguration --version 52
 from weasyprint.text.fonts import FontConfiguration
 
@@ -794,13 +794,14 @@ def pagoprov(request):
                                   "where year(Fecha) = 2021 "
                                   "and b.Rfc = '" + RFC + 
                                   "' group by year(Fecha), month(Fecha)"
-                                        )   
+                                  )   
     
     print(qry.query)
     
 
     context = {
-        "qryISR": qry,        
+        "qryISR": qry,    
+        "titulo" :  "Reporte Pago Provisional"
         # "frm" : form
     }
 
@@ -963,17 +964,17 @@ def reportePPD(request):
     #print(qry)
 
     context = { "Titulo" : "Reporte de parcialidades", "qry" : qry}
-    #html = render_to_string("reportePPD.html", context)
+    html = render_to_string("reportePPD.html", context)
+    css = CSS(string="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css")
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = "inline; report.pdf"
+    font_config = FontConfiguration()
+    HTML(string=html).write_pdf(response, stylesheets=[css], font_config=font_config)
+    
 
-    #response = HttpResponse(content_type="application/pdf")
-    #response["Content-Disposition"] = "inline; report.pdf"
+    return response
 
-    #font_config = FontConfiguration()
-    #HTML(string=html).write_pdf(response, font_config=font_config)
-
-    #return response
-
-    return render(request, "reportePPD.html", context)
+    #return render(request, "reportePPD.html", context)
 
 @login_required(login_url='/')
 def factParciales(request):
