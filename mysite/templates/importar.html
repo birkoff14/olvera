@@ -105,14 +105,14 @@
                             </small></td>
                             <td><small>
                                 <a class="btn btn-primary btn-sm"
-                                href="#" onclick="return abrir_modal('{% url 'invoiceDetail' dt.UUIDInt %}');">
+                                href="#" onclick="return abrir_modal('{% url 'invoiceDetail' dt.id %}');">
                                 <span class="fa fa-plus-circle"></span> Relacionadas
                             </a>
                             </small></td>
                         <td><small>{{ dt.TasaOCuota }} - {{ dt.Importe }} </small></td>
                         <td>
                             <a class="btn btn-primary btn-sm"
-                                href="#" onclick="return abrir_modal('{% url 'detailFact' dt.UUIDInt %}');">
+                                href="#" onclick="return abrir_modal('{% url 'detailFact' dt.id %}');">
                                 <span class="fa fa-plus-circle"></span> Ver
                             </a>
                         </td>

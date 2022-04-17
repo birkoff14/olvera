@@ -111,23 +111,23 @@ def invoice(request):
     if request.POST.get("frmEnvia", "") == "":
         txtInicial = "Selecciona un filtro para mostrar las facturas"
     else:
-        queryset = Comprobante.objects.raw("select 1 as id, e.Nombre NombreE, e.Rfc RFCE, upper(b.Nombre) NombreR, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, "
+        queryset = Comprobante.objects.raw("select '008355782F344AEBB6A7F462976D57A6' as id, e.Nombre NombreE, e.Rfc RFCE, upper(b.Nombre) NombreR, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, "
                                            "case when d.TasaOCuota is not null then d.TasaOCuota*100 else '' end  TasaOCuota, case when d.Importe is not null then d.Importe else '' end Importe, b.Rfc, a.TipoCambio, "
-                                           "Moneda, a.UUIDInt, YEAR(Fecha) Periodo, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes "
+                                           "Moneda, a.id, YEAR(Fecha) Periodo, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes "
                                            "from conciliacion_comprobante a "
                                            "inner join conciliacion_receptor b "
-                                           "on a.IDKey = b.IDKey "
-                                           "inner join conciliacion_concepto c "
-                                           "on a.IDKey = c.IDKey "
+                                           "on a.id = b.UUIDInt_id "
+                                           "left join conciliacion_concepto c "
+                                           "on a.id = c.UUIDInt_id "
                                            "left join conciliacion_traslado d "
-                                           "on a.IDKey = d.IDKey "
-                                           "inner join conciliacion_emisor e on a.IDKey = e.IDKey "
+                                           "on a.id = d.UUIDInt_id "
+                                           "inner join conciliacion_emisor e on a.id = e.UUIDInt_id "
                                            "where a.TipoEmRe = 'Emitidas' "
                                            + RFCFiltro
                                            + NombreFiltro
                                            + AñoFiltro
                                            + MesFiltro
-                                           + " group by a.UUIDInt "
+                                           + " group by a.id "
                                            + "order by Fecha desc, e.Nombre"
                                            )
         print(queryset)
@@ -149,10 +149,10 @@ def invoice(request):
     )
     # print(rfc)
     anio = Comprobante.objects.raw(
-        "select distinct 1 as id, year(Fecha) Año from conciliacion_comprobante order by 2"
+        "select distinct '008355782F344AEBB6A7F462976D57A6' as id, year(Fecha) Año from conciliacion_comprobante order by 2"
     )
     mes = Comprobante.objects.raw(
-        'select distinct 1 as id, DATE_FORMAT(Fecha, CONCAT(char(37), "m")) Mes from conciliacion_comprobante order by cast(month(Fecha) as int)'
+        "select distinct '008355782F344AEBB6A7F462976D57A6' as id, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes from conciliacion_comprobante order by cast(month(Fecha) as int)"
     )    
 
     context = {
@@ -224,7 +224,7 @@ def calcNomina(request):
     
     if(monto):
         
-        mensual = TablaMensual.objects.raw("select 1 as id, Bruto, LI, Excedente, Tasa, (Excedente*Tasa) ImpMarginal, CuotaFija, "
+        mensual = TablaMensual.objects.raw("select '1' as id, Bruto, LI, Excedente, Tasa, (Excedente*Tasa) ImpMarginal, CuotaFija, "
                                            "(Excedente*Tasa)+CuotaFija as ISR, "
                                            "Subsidio, (((Excedente*Tasa)+CuotaFija)-Subsidio) ISRReten, (((Excedente*Tasa)+CuotaFija)-Subsidio)/2 ISRQuin, "
                                            + monto + "-(((Excedente*Tasa)+CuotaFija)-Subsidio) Neto, " 
@@ -331,12 +331,12 @@ def calcIMSS(request):
 def parcialidades(request):
 
     qry = Comprobante.objects.raw(
-        "select 1 as id, tbl.*, b.UUIDInt, b.Total,  YEAR(b.Fecha) Año, MONTH(b.Fecha) Mes from ("
+        "select '1' as id, tbl.*, b.UUIDInt_id, b.Total,  YEAR(b.Fecha) Año, MONTH(b.Fecha) Mes from ("
         "select count(1) NoParc, IdDocumento, Sum(ImpPagado) ImpPagado, Sum(ImpSaldoAnt) ImpSaldoAnt, Sum(ImpSaldoInsoluto) ImpSaldoInsoluto "
         "from conciliacion_doctorelacionado group by IdDocumento "
         ") tbl "
         "inner join conciliacion_comprobante b "
-        "on SUBSTRING_INDEX(b.UUIDInt, '@', 1) = tbl.IdDocumento"
+        "on SUBSTRING_INDEX(b.UUIDInt_id, '@', 1) = tbl.IdDocumento"
     )
 
     context = {
@@ -381,23 +381,23 @@ def receipts(request):
     if request.POST.get("frmEnvia", "") == "":
         txtInicial = "Selecciona un filtro para mostrar las facturas"
     else:
-        queryset = Comprobante.objects.raw("select 1 as id, e.Nombre NombreE, e.Rfc RFCE, upper(b.Nombre) NombreR, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, "                                           
+        queryset = Comprobante.objects.raw("select '008355782F344AEBB6A7F462976D57A6' as id, e.Nombre NombreE, e.Rfc RFCE, upper(b.Nombre) NombreR, a.SubTotal, ROUND(a.Total-a.SubTotal, 2) IVA, Total, c.Descripcion, "                                           
                                            "case when d.TasaOCuota is not null then d.TasaOCuota*100 else '' end  TasaOCuota, case when d.Importe is not null then d.Importe else '' end Importe, b.Rfc, a.TipoCambio, "
-                                           "Moneda, a.UUIDInt, YEAR(Fecha) Periodo, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes "
+                                           "Moneda, a.id, YEAR(Fecha) Periodo, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes "
                                            "from conciliacion_comprobante a "
                                            "inner join conciliacion_receptor b "
-                                           "on a.IDKey = b.IDKey "
-                                           "inner join conciliacion_concepto c "
-                                           "on a.IDKey = c.IDKey "
+                                           "on a.id = b.UUIDInt_id "
+                                           "left join conciliacion_concepto c "
+                                           "on a.id = c.UUIDInt_id "
                                            "left join conciliacion_traslado d "
-                                           "on a.IDKey = d.IDKey "
-                                           "inner join conciliacion_emisor e on a.IDKey = e.IDKey "
+                                           "on a.id = d.UUIDInt_id "
+                                           "inner join conciliacion_emisor e on a.id = e.UUIDInt_id "
                                            "where a.TipoEmRe = 'Recibidas' "                                           
                                            + RFCFiltro
                                            + NombreFiltro
                                            + AñoFiltro
                                            + MesFiltro
-                                           + " group by a.UUIDInt "
+                                           + " group by a.id "
                                            + "order by Fecha desc, b.Nombre"
                                            )
         print(queryset)
@@ -419,10 +419,10 @@ def receipts(request):
     )
     print(rfc)
     anio = Comprobante.objects.raw(
-        "select distinct 1 as id, year(Fecha) Año from conciliacion_comprobante order by 2"
+        "select distinct '008355782F344AEBB6A7F462976D57A6' as id, year(Fecha) Año from conciliacion_comprobante order by 2"
     )
     mes = Comprobante.objects.raw(
-        'select distinct 1 as id, DATE_FORMAT(Fecha, CONCAT(char(37), "m")) Mes from conciliacion_comprobante order by cast(month(Fecha) as int)'
+        "select distinct '008355782F344AEBB6A7F462976D57A6' as id, DATE_FORMAT(Fecha, CONCAT(char(37), 'm')) Mes from conciliacion_comprobante order by cast(month(Fecha) as int)"
     ) 
 
     context = {
@@ -653,7 +653,7 @@ def conciliacion(request):
                 + tabla
                 + """ a
                     inner join conciliacion_emisor b
-                    on a.IDKey = b.IDKey 
+                    on a.id = b.UUIDInt_id 
                     inner join conciliacion_balance c 
                     on b.Rfc = c.RFC 
                     and year(a.Fecha) = c.Año

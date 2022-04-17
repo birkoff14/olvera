@@ -199,12 +199,13 @@ class RFCClientes(models.Model):
     Rfc = models.CharField(max_length=20, blank=False)
 
 class Comprobante(models.Model):        
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     Activo = models.CharField(max_length=20, blank=False)
     TipoEmRe = models.CharField(max_length=10, blank=False)
     Version = models.CharField(max_length=5, blank=False)
     Serie = models.CharField(max_length=20, blank=False)
     Folio = models.CharField(max_length=50, blank=False)
-    Fecha = models.CharField(max_length=25, blank=False)
+    Fecha = models.DateTimeField()
     FormaPago = models.CharField(max_length=100, blank=False)
     NoCertificado = models.CharField(max_length=50, blank=False)
     SubTotal = models.CharField(max_length=15, blank=False)
@@ -214,23 +215,19 @@ class Comprobante(models.Model):
     TipoDeComprobante = models.CharField(max_length=10, blank=False)
     MetodoPago = models.CharField(max_length=100, blank=False)
     LugarExpedicion = models.CharField(max_length=250, blank=False)
-    IDKey = models.IntegerField(db_index=True)
-    UUIDInt = models.CharField(max_length=60, blank=False)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True, verbose_name="Fecha")
     
 class Emisor(models.Model):        
     Rfc = models.CharField(max_length=15, blank=False)
     Nombre = models.CharField(max_length=250, blank=False)
     RegimenFiscal = models.CharField(max_length=5, blank=False)   
-    UUIDInt = models.CharField(max_length=60, blank=False)
-    IDKey = models.IntegerField(db_index=True, blank=False) 
+    UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True) 
 
 class Receptor(models.Model):        
     Rfc = models.CharField(max_length=15, blank=False)
     Nombre = models.CharField(max_length=250, blank=False)
     UsoCFDI = models.CharField(max_length=5, blank=False)
-    UUIDInt = models.CharField(max_length=60, blank=False)
-    IDKey = models.IntegerField(db_index=True, blank=False)
+    UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
 
 class Concepto(models.Model):    
     ClaveProdServ = models.CharField(max_length=15, blank=False)
@@ -241,9 +238,8 @@ class Concepto(models.Model):
     Descripcion = models.CharField(max_length=2500, blank=False)
     ValorUnitario = models.CharField(max_length=20, blank=False)
     Importe = models.CharField(max_length=20, blank=False)
-    UUIDInt = models.CharField(max_length=60, blank=False)
-    IDKey = models.IntegerField(db_index=True, blank=False)
-    #UUIDInt = models.UUIDField(default=uuid.uuid4, editable=False)
+    UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
+    
     #UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
 
 
@@ -253,8 +249,7 @@ class Pago(models.Model):
     MonedaP = models.CharField(max_length=20, blank=False)
     Monto = models.CharField(max_length=20, blank=False)
     NumOperacion = models.CharField(max_length=150, blank=False)
-    UUIDInt = models.CharField(max_length=60, blank=False)
-    IDKey = models.IntegerField(db_index=True, blank=False)
+    UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
 
 
 class DoctoRelacionado(models.Model):    
@@ -267,8 +262,7 @@ class DoctoRelacionado(models.Model):
     ImpSaldoAnt = models.CharField(max_length=20, blank=False)
     ImpPagado = models.CharField(max_length=20, blank=False)
     ImpSaldoInsoluto = models.CharField(max_length=20, blank=False)
-    UUIDInt = models.CharField(max_length=60, blank=False)
-    IDKey = models.IntegerField(db_index=True, blank=False)
+    UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
     #UUIDInt = models.UUIDField(default=uuid.uuid4, editable=False)
     #UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
 
@@ -276,8 +270,7 @@ class DoctoRelacionado(models.Model):
 class Impuestos(models.Model):
     TotalImpuestosTrasladados = models.CharField(max_length=20, blank=False)
     TotalImpuestosRetenidos = models.CharField(max_length=20, blank=False)
-    UUIDInt = models.CharField(max_length=60, blank=False)
-    IDKey = models.IntegerField(db_index=True, blank=False)
+    UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
 
 
 class Traslado(models.Model):
@@ -286,8 +279,7 @@ class Traslado(models.Model):
     TipoFactor = models.CharField(max_length=20, blank=False)
     TasaOCuota = models.CharField(max_length=20, blank=False)
     Importe = models.CharField(max_length=20, blank=False)
-    UUIDInt = models.CharField(max_length=60, blank=False)
-    IDKey = models.IntegerField(db_index=True, blank=False)
+    UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
 
 
 class TimbreFiscalDigital(models.Model):
@@ -296,7 +288,7 @@ class TimbreFiscalDigital(models.Model):
     FechaTimbrado = models.CharField(max_length=30, blank=False)
     RfcProvCertif = models.CharField(max_length=20, blank=False)
     NoCertificadoSAT = models.CharField(max_length=20, blank=False)
-    UUIDInt = models.CharField(max_length=60, blank=False)
+    UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
     
 class InProyecto(models.Model):
     idTipo = models.AutoField(primary_key=True)
@@ -343,7 +335,7 @@ class DatosFactura(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
-    UUIDInt = models.CharField(max_length=60, blank=False)
+    UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True, verbose_name="Fecha")
     
 # Nomina
@@ -357,14 +349,12 @@ class Nomina(models.Model):
     TotalOtrosPagos = models.CharField(max_length=50, blank=False)
     TotalPercepciones = models.CharField(max_length=50, blank=False)
     Version = models.CharField(max_length=50, blank=False)
-    UUIDInt = models.CharField(max_length=60, blank=False)
-    IDKey = models.IntegerField(db_index=True, blank=False)
+    UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
 
 
 class NEmisor(models.Model):
     RegistroPatronal = models.CharField(max_length=50, blank=False)
-    UUIDInt = models.CharField(max_length=60, blank=False)
-    IDKey = models.IntegerField(db_index=True, blank=False)
+    UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
 
 
 class NReceptor(models.Model):
@@ -384,16 +374,14 @@ class NReceptor(models.Model):
     TipoContrato = models.CharField(max_length=50, blank=False)
     TipoJornada = models.CharField(max_length=50, blank=False)
     TipoRegimen = models.CharField(max_length=50, blank=False)
-    UUIDInt = models.CharField(max_length=60, blank=False)
-    IDKey = models.IntegerField(db_index=True, blank=False)
+    UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
 
 
 class NPercepciones(models.Model):
     TotalExento = models.CharField(max_length=50, blank=False)
     TotalGravado = models.CharField(max_length=50, blank=False)
     TotalSueldos = models.CharField(max_length=50, blank=False)
-    UUIDInt = models.CharField(max_length=60, blank=False)
-    IDKey = models.IntegerField(db_index=True, blank=False)
+    UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
 
 
 class NPercepcion(models.Model):
@@ -402,8 +390,7 @@ class NPercepcion(models.Model):
     ImporteExento = models.CharField(max_length=50, blank=False)
     ImporteGravado = models.CharField(max_length=50, blank=False)
     TipoPercepcion = models.CharField(max_length=50, blank=False)
-    UUIDInt = models.CharField(max_length=60, blank=False)
-    IDKey = models.IntegerField(db_index=True, blank=False)
+    UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
 
 
 class OtroPago(models.Model):
@@ -411,13 +398,11 @@ class OtroPago(models.Model):
     Concepto = models.CharField(max_length=50, blank=False)
     Importe = models.CharField(max_length=50, blank=False)
     TipoOtroPago = models.CharField(max_length=50, blank=False)
-    UUIDInt = models.CharField(max_length=60, blank=False)
-    IDKey = models.IntegerField(db_index=True, blank=False)
+    UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
 
 class SubsidioAlEmpleo(models.Model):
     SubsidioCausado = models.CharField(max_length=50, blank=False)
-    UUIDInt = models.CharField(max_length=60, blank=False)
-    IDKey = models.IntegerField(db_index=True, blank=False)
+    UUIDInt = models.ForeignKey(Comprobante, on_delete=models.CASCADE, null=True)
     
 class TablaQuincenal(models.Model):
     LimiteInferior = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
