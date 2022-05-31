@@ -454,3 +454,34 @@ class DatosObrero(models.Model):
     RiesgosTrabajo = models.DecimalField(max_digits=19, decimal_places=7, blank=False)
     InvalidezVO = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
     CEAVObrero = models.DecimalField(max_digits=19, decimal_places=4, blank=False)
+
+
+class Definitivos(models.Model):
+    RFC01 = models.CharField(max_length=250, blank=False)
+    Nombre02 = models.CharField(max_length=500, blank=False)
+    Situacion03 = models.CharField(max_length=250, blank=False)
+    NoPresuncion04 = models.CharField(max_length=250, blank=False)
+    FechaPublicacion05 = models.CharField(max_length=250, blank=False)
+    SATPresunto06 = models.CharField(max_length=250, blank=False)
+    NoFechaDOF07 = models.CharField(max_length=250, blank=False)
+    PublicacionDOF08 = models.CharField(max_length=250, blank=False)
+    SATDesvirtuados09 = models.CharField(max_length=250, blank=False)
+    NoFechaGlobalDOF10 = models.CharField(max_length=250, blank=False)
+    PublicacionDOFdesvirtuados11 = models.CharField(max_length=250, blank=False)
+    NoFechaDefinitivosSAT12 = models.CharField(max_length=250, blank=False)
+    SATPaginaDefinitivos13 = models.CharField(max_length=250, blank=False)
+    NoFechaGlobalDefinitivosDOF14 = models.CharField(max_length=250, blank=False)
+    PublicacionDOFDefinitivos15 = models.CharField(max_length=250, blank=False)
+    SentenciaSAT16 = models.CharField(max_length=250, blank=False)
+    SentenciaFavorableSAT17 = models.CharField(max_length=250, blank=False)
+    OficioGlobalDOF18 = models.CharField(max_length=250, blank=False)
+    PublicacionDOFSentenciaFavorable19 = models.CharField(max_length=250, blank=False)
+
+
+class NoLocalizados(models.Model):
+    RFC = models.CharField(max_length=50, blank=False)
+    RazonSocial = models.CharField(max_length=500, blank=False)
+    TipoPersona = models.CharField(max_length=50, blank=False)
+    Supuesto = models.CharField(max_length=50, blank=False)
+    FechaPrimera = models.CharField(max_length=50, blank=False)
+    Entidad = models.CharField(max_length=50, blank=False)

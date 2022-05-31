@@ -622,9 +622,8 @@ def conciliacion(request):
 
     rfc = Balance.objects.raw("select DISTINCT 1 as id, a.RFC, b.Nombre "
                               "from conciliacion_balance a "
-                              "inner join conciliacion_emisor b "
-                              "on a.RFC = b.Rfc "
-                              "group by RFC ")
+                              "inner join EmisorNoDuplicado b "
+                              "on a.RFC = b.Rfc ")
 
     cuenta = request.GET.get("cuenta", "")
     campo_1 = request.GET.get("campo_1", "")
@@ -887,24 +886,24 @@ def qryReporteRecibidas(request, RFC, Nombre):
     _nombre = Nombre
 
     qry = """select tbl.* from (
-        select 1 as id, '1' Tipo, Activo, Version, Serie, Folio, date_format(Fecha, CONCAT(char(37), 'm', '-', char(37), 'd', '-', char(37), 'Y')) Fecha, FormaPago, Total, a.UUIDInt UUID, '' UUIDHijo, TipoCambio, '0' NumParcialidad, 
-        '' ImpSaldoAnt, '' ImpPagado, '' ImpSaldoInsoluto, b.Rfc, b.Nombre, c.Rfc RFCR, c.Nombre NombreR, TipoEmRe, a.idKey
+        select '008355782F344AEBB6A7F462976D57A6' as id, '1' Tipo, Activo, Version, Serie, Folio, date_format(Fecha, CONCAT(char(37), 'm', '-', char(37), 'd', '-', char(37), 'Y')) Fecha, FormaPago, Total, a.id UUID, '' UUIDHijo, TipoCambio, '0' NumParcialidad, 
+        '' ImpSaldoAnt, '' ImpPagado, '' ImpSaldoInsoluto, b.Rfc, b.Nombre, c.Rfc RFCR, c.Nombre NombreR, TipoEmRe
         from conciliacion_comprobante a
         inner join conciliacion_emisor b
-        on a.IDKey = b.IDKey
+        on a.id = b.UUIDInt_id
         inner join conciliacion_receptor c
-        on a.IDKey = c.IDKey
+        on a.id = c.UUIDInt_id
         where TipoCambio = 'PPD'
         union all
-        select 1 as id, '2' Tipo, '' Activo, '' Version, a.Serie, a.Folio, date_format(Fecha, CONCAT(char(37), 'm', '-', char(37), 'd', '-', char(37), 'Y')) Fecha, '' FormaPago, '' Total, IdDocumento UUID, a.UUIDInt UUIDHijo, MetodoDePagoDr TipoCambio, NumParcialidad, 
-        ImpSaldoAnt, ImpPagado, ImpSaldoInsoluto, b.Rfc, b.Nombre, d.Rfc RFCR, d.Nombre NombreR, '' TipoEmRe, a.IDKey
+        select '008355782F344AEBB6A7F462976D57A6' as id, '2' Tipo, '' Activo, '' Version, a.Serie, a.Folio, date_format(Fecha, CONCAT(char(37), 'm', '-', char(37), 'd', '-', char(37), 'Y')) Fecha, '' FormaPago, '' Total, IdDocumento UUID, a.UUIDInt_id UUIDHijo, MetodoDePagoDr TipoCambio, NumParcialidad, 
+        ImpSaldoAnt, ImpPagado, ImpSaldoInsoluto, b.Rfc, b.Nombre, d.Rfc RFCR, d.Nombre NombreR, '' TipoEmRe
         from conciliacion_doctorelacionado a
         inner join conciliacion_emisor b
-        on a.IDKey = b.IDKey
+        on a.UUIDInt_id = b.UUIDInt_id
         inner join conciliacion_comprobante c
-        on a.IDKey = c.IDKey
+        on a.UUIDInt_id = c.id
         inner join conciliacion_receptor d
-        on a.IDKey = d.IDKey
+        on a.UUIDInt_id = d.UUIDInt_id
         ) tbl        
         where tbl.Rfc  like CONCAT(char(37), '""" + _rfc + """' ,Char(37)) 
         and tbl.Nombre like CONCAT(char(37), '""" + _nombre + """' ,Char(37))
@@ -918,22 +917,22 @@ def qryReporte(request, RFC, Nombre):
     _nombre = Nombre
 
     qry = """select tbl.* from (
-        select 1 as id, '1' Tipo, Activo, Version, Serie, Folio, date_format(Fecha, CONCAT(char(37), 'm', '-', char(37), 'd', '-', char(37), 'Y')) Fecha, FormaPago, Total, a.UUIDInt UUID, '' UUIDHijo, TipoCambio, '0' NumParcialidad, 
-        '' ImpSaldoAnt, '' ImpPagado, '' ImpSaldoInsoluto, b.Rfc, b.Nombre, c.Rfc RFCR, c.Nombre NombreR, TipoEmRe, a.idKey
+        select '008355782F344AEBB6A7F462976D57A6' as id, '1' Tipo, Activo, Version, Serie, Folio, date_format(Fecha, CONCAT(char(37), 'm', '-', char(37), 'd', '-', char(37), 'Y')) Fecha, FormaPago, Total, a.id UUID, '' UUIDHijo, TipoCambio, '0' NumParcialidad, 
+        '' ImpSaldoAnt, '' ImpPagado, '' ImpSaldoInsoluto, b.Rfc, b.Nombre, c.Rfc RFCR, c.Nombre NombreR, TipoEmRe
         from conciliacion_comprobante a
         inner join conciliacion_emisor b
-        on a.IDKey = b.IDKey
+        on a.id = b.UUIDInt_id
         inner join conciliacion_receptor c
-        on a.IDKey = c.IDKey
+        on a.id = c.UUIDInt_id
         where TipoCambio = 'PPD'
         union all
-        select 1 as id, '2' Tipo, '' Activo, '' Version, a.Serie, a.Folio, date_format(Fecha, CONCAT(char(37), 'm', '-', char(37), 'd', '-', char(37), 'Y')) Fecha, '' FormaPago, '' Total, IdDocumento UUID, a.UUIDInt UUIDHijo, MetodoDePagoDr TipoCambio, NumParcialidad, 
-        ImpSaldoAnt, ImpPagado, ImpSaldoInsoluto, b.Rfc, b.Nombre, '', '', '' TipoEmRe, a.IDKey
+        select '008355782F344AEBB6A7F462976D57A6' as id, '2' Tipo, '' Activo, '' Version, a.Serie, a.Folio, date_format(Fecha, CONCAT(char(37), 'm', '-', char(37), 'd', '-', char(37), 'Y')) Fecha, '' FormaPago, '' Total, IdDocumento UUID, a.id UUIDHijo, MetodoDePagoDr TipoCambio, NumParcialidad, 
+        ImpSaldoAnt, ImpPagado, ImpSaldoInsoluto, b.Rfc, b.Nombre, '', '', '' TipoEmRe
         from conciliacion_doctorelacionado a
         inner join conciliacion_emisor b
-        on a.IDKey = b.IDKey
+        on a.UUIDInt_id = b.UUIDInt_id
         inner join conciliacion_comprobante c
-        on a.IDKey = c.IDKey
+        on a.UUIDInt_id = c.id
         ) tbl        
         where tbl.Rfc  like CONCAT(char(37), '""" + _rfc + """' ,Char(37)) 
         and tbl.Nombre like CONCAT(char(37), '""" + _nombre + """' ,Char(37)) 
@@ -1023,3 +1022,41 @@ def reporteRecibidas(request):
     }
 
     return render(request, "factParcRecibidas.html", context)
+
+def listasNegras(request):
+
+    defEmisor = Comprobante.objects.raw("""select d.Activo, d.Serie, d.id, a.Rfc RFCE, a.Nombre NombreE, c.Rfc, c.Nombre 
+                                            from conciliacion_emisor a
+                                            inner join conciliacion_receptor c on a.UUIDInt_id = c.UUIDInt_id 
+                                            inner join conciliacion_comprobante d on a.UUIDInt_id = d.id
+                                            inner join conciliacion_definitivos b on a.Rfc = b.RFC01 """)
+
+    NolocEmisor = Comprobante.objects.raw("""select d.Activo, d.Serie, d.id, a.Rfc RFCE, a.Nombre NombreE, c.Rfc, c.Nombre
+                                              from conciliacion_emisor a
+                                              inner join conciliacion_receptor c on a.UUIDInt_id = c.UUIDInt_id
+                                              inner join conciliacion_comprobante d on a.UUIDInt_id = d.id 
+                                              inner join conciliacion_nolocalizados b on a.Rfc = b.RFC """)
+
+    defReceptor = Comprobante.objects.raw("""select d.Activo, d.Serie, d.id, a.Rfc RFCE, a.Nombre NombreE, c.Rfc, c.Nombre
+                                              from conciliacion_emisor a
+                                              inner join conciliacion_receptor c on a.UUIDInt_id = c.UUIDInt_id 
+                                              inner join conciliacion_comprobante d on a.UUIDInt_id = d.id
+                                              inner join conciliacion_definitivos b on c.Rfc = b.RFC01""")
+
+    NolocReceptor = Comprobante.objects.raw("""select d.Activo, d.Serie, d.id, a.Rfc RFCE, a.Nombre NombreE, c.Rfc, c.Nombre
+                                                from conciliacion_emisor a
+                                                inner join conciliacion_receptor c on a.UUIDInt_id = c.UUIDInt_id
+                                                inner join conciliacion_comprobante d on a.UUIDInt_id = d.id 
+                                                inner join conciliacion_nolocalizados b on c.Rfc = b.RFC""")
+
+    print(xlsfile)
+
+    context = {
+        "Titulo" : "Reporte listas negras",
+        "defEmisor" : defEmisor,
+        "NolocEmisor" : NolocEmisor,
+        "defReceptor" : defReceptor,
+        "NolocReceptor" : NolocReceptor,
+    }
+
+    return render(request, "listasNegras.html", context)

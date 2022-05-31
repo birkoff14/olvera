@@ -41,6 +41,7 @@ urlpatterns = [
     path("factParciales", views.factParciales, name="factParciales"),
     path("factParcialesRecibidas", views.reporteRecibidas, name="factParcialesRecibidas"),
     path("testPDF", views.testPDF, name="testPDF"),
+    path("listas", views.listasNegras, name="listas"),
 
     path('', include(router.urls)),
 ]
